@@ -3,4 +3,5 @@
 window.VIBEGUYS_CONFIG = {
   supabaseUrl: "https://nfecezfbadvtifujiqio.supabase.co",
   supabasePublishableKey: "sb_publishable_VyS4aPzYS9AQ7TIXCo9rnw_DL-ccwNn",
+  authRedirectUrl: "https://vibeguys-gilt.vercel.app/",
 };

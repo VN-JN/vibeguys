@@ -3,7 +3,7 @@
 1. Create a Supabase project, then run `supabase/schema.sql` in the SQL Editor.
 2. In **Project Settings → API Keys**, copy the project URL and a **publishable** key into a local `config.js`. Never use a secret or service-role key in this browser app.
 3. In **Authentication → Providers**, enable Google and add the Google OAuth client ID and secret created in Google Cloud Console.
-4. Add each local/production callback URL to **Authentication → URL Configuration → Redirect URLs**. For local testing with this project use `http://localhost:4173/`.
+4. Add each local/production callback URL to **Authentication → URL Configuration → Redirect URLs**. Use `http://localhost:4173/` locally and `https://vibeguys-gilt.vercel.app/` for the current Vercel deployment.
 5. In Google Cloud Console, add the Supabase callback URL shown in the Google provider panel to the OAuth client's authorized redirect URIs.
 6. Set the application Site URL to the production app URL before launch.
 
