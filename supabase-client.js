@@ -40,7 +40,7 @@
   const originalText=new WeakMap(),originalAttributes=new WeakMap(); let localizationQueued=false;
   function translateText(source){
     const trimmed=source.trim(); if(koreanCopy[trimmed])return source.replace(trimmed,koreanCopy[trimmed]);
-    return source.replace(/(\d[\d,]*) reviews\b/g,'$1개 리뷰').replace(/(\d[\d,]*) taste tests\b/g,'$1개 사용 후기').replace(/\bProductivity\b/g,'생산성').replace(/\bDeveloper Tools\b/g,'개발 도구').replace(/\bLifestyle\b/g,'라이프스타일').replace(/\bUtilities\b/g,'유틸리티').replace(/\bWeird & Fun\b/g,'독특하고 재미있는 것').replace(/\bDesign\b/g,'디자인').replace(/\bFree\b/g,'무료').replace(/\bTry\b/g,'사용해 보기');
+    return source.replace(/(\d[\d,]*) reviews\b/g,'$1개 리뷰').replace(/(\d[\d,]*) taste tests\b/g,'$1개 사용 후기').replace(/\/mo\b/g,'/월').replace(/\bProductivity\b/g,'생산성').replace(/\bDeveloper Tools\b/g,'개발 도구').replace(/\bLifestyle\b/g,'라이프스타일').replace(/\bUtilities\b/g,'유틸리티').replace(/\bWeird & Fun\b/g,'독특하고 재미있는 것').replace(/\bDesign\b/g,'디자인').replace(/\bFree\b/g,'무료').replace(/\bTry\b/g,'사용해 보기');
   }
   function localizeDocument(){
     const korean=document.documentElement.lang==='ko'; const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT); const nodes=[]; while(walker.nextNode())nodes.push(walker.currentNode);
