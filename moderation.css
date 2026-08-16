@@ -1,0 +1,10 @@
+.admin-queue{display:grid;gap:12px}
+.admin-review{background:#fffdf8;border:1px solid var(--line);display:flex;gap:24px;justify-content:space-between;padding:20px}
+.admin-review h3{font-size:23px;margin:12px 0 5px}
+.admin-review p{font-size:12px;line-height:1.55;margin-bottom:7px}
+.admin-review a{color:var(--deep-red);font-size:11px;font-weight:800;text-decoration:underline}
+.scan-copy{background:var(--cream);padding:9px}
+.pill.risk{background:var(--coral);color:#fff}
+.admin-actions{align-items:flex-start;display:flex;flex-direction:column;gap:8px;min-width:150px}
+.admin-actions .btn{width:100%}
+@media(max-width:850px){.admin-review{flex-direction:column}.admin-actions{flex-direction:row}}
