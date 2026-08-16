@@ -28,13 +28,23 @@
     'Admin demo':'관리자 데모','The tasting counter.':'검토 대기열','A local-only moderation view. No actions persist outside this browser session.':'로컬 데모 검토 화면입니다. 이 화면의 작업은 브라우저 밖에 저장되지 않습니다.',
     'Vibe queue':'등록 대기열','Review moderation':'후기 검토','Reports':'신고','Needs a human look':'사람의 검토가 필요해요','Approve':'승인','Resolve':'처리','Review':'검토',
     'Placement rules':'노출 원칙','Fast-made, thoughtfully picked.':'빠르게 만들고, 신중하게 골랐습니다.','Saved':'저장됨','Save':'저장','Sign in':'로그인','Account':'계정',
-    'Support':'후원','Explore':'탐색','Trending':'인기','Staff Picks':'스태프 픽','Free':'무료','Freemium':'프리미엄 체험','Paid':'유료','All':'전체','All platforms':'전체 플랫폼'
+    'Support':'후원','Explore':'탐색','Trending':'인기','Staff Picks':'스태프 픽','Free':'무료','Freemium':'프리미엄 체험','Paid':'유료','All':'전체','All platforms':'전체 플랫폼',
+    'AI that helps':'AI가 돕습니다','Tools worth using':'쓸 만한 도구','Built by people with ideas':'아이디어 있는 사람들이 만든 것','Fresh from the internet':'인터넷에서 갓 온 것',
+    'Browse all 20':'전체 20개 보기','Try':'사용해 보기','Productivity':'생산성','Design':'디자인','Developer Tools':'개발 도구','Lifestyle':'라이프스타일','Utilities':'유틸리티','Weird & Fun':'독특하고 재미있는 것',
+    'Your calm command center for the projects that actually matter.':'정말 중요한 프로젝트를 위한 차분한 통합 공간입니다.','A calm command center for the projects that actually matter.':'중요한 프로젝트를 위한 차분한 통합 공간입니다.',
+    'Turn scattered research into a story your team can use.':'흩어진 리서치를 팀이 활용할 수 있는 이야기로 바꿉니다.','Ship ideas before your coffee gets cold.':'커피가 식기 전에 아이디어를 출시하세요.',
+    'A season-by-season memory for people who grow things.':'무언가를 기르는 사람을 위한 계절별 기록입니다.','Explain the tangled thing without opening a giant diagram tool.':'거대한 다이어그램 도구 없이도 복잡한 일을 설명합니다.',
+    'Build a tiny picnic scene with strangers, one pixel at a time.':'낯선 사람들과 픽셀 하나씩 작은 피크닉 장면을 만듭니다.'
   };
   const koreanPlaceholders={'Try invoice, focus, or weird':'예: invoice, focus, weird','e.g. Invoice Snack':'예: Invoice Snack','What useful thing does it do?':'어떤 유용한 기능을 제공하나요?','https://':'https://'};
   const originalText=new WeakMap(),originalAttributes=new WeakMap(); let localizationQueued=false;
+  function translateText(source){
+    const trimmed=source.trim(); if(koreanCopy[trimmed])return source.replace(trimmed,koreanCopy[trimmed]);
+    return source.replace(/(\d[\d,]*) reviews\b/g,'$1개 리뷰').replace(/(\d[\d,]*) taste tests\b/g,'$1개 사용 후기').replace(/\bProductivity\b/g,'생산성').replace(/\bDeveloper Tools\b/g,'개발 도구').replace(/\bLifestyle\b/g,'라이프스타일').replace(/\bUtilities\b/g,'유틸리티').replace(/\bWeird & Fun\b/g,'독특하고 재미있는 것').replace(/\bDesign\b/g,'디자인').replace(/\bFree\b/g,'무료').replace(/\bTry\b/g,'사용해 보기');
+  }
   function localizeDocument(){
     const korean=document.documentElement.lang==='ko'; const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT); const nodes=[]; while(walker.nextNode())nodes.push(walker.currentNode);
-    for(const node of nodes){const parent=node.parentElement;if(!parent||['SCRIPT','STYLE'].includes(parent.tagName))continue;if(!originalText.has(node))originalText.set(node,node.nodeValue);const source=originalText.get(node);const trimmed=source.trim();const localized=koreanCopy[trimmed];const next=korean&&localized?source.replace(trimmed,localized):source;if(node.nodeValue!==next)node.nodeValue=next;}
+    for(const node of nodes){const parent=node.parentElement;if(!parent||['SCRIPT','STYLE'].includes(parent.tagName))continue;if(!originalText.has(node))originalText.set(node,node.nodeValue);const source=originalText.get(node);const next=korean?translateText(source):source;if(node.nodeValue!==next)node.nodeValue=next;}
     for(const element of document.querySelectorAll('[placeholder],[title],[aria-label]')){let original=originalAttributes.get(element);if(!original){original={placeholder:element.getAttribute('placeholder'),title:element.getAttribute('title'),'aria-label':element.getAttribute('aria-label')};originalAttributes.set(element,original)}for(const attribute of Object.keys(original)){if(original[attribute]===null)continue;const translated=koreanCopy[original[attribute]]||koreanPlaceholders[original[attribute]];const next=korean&&translated?translated:original[attribute];if(element.getAttribute(attribute)!==next)element.setAttribute(attribute,next);}}
     document.title=korean?'VibeGuys — 바이브 코딩 인터넷의 좋은 것들':'VibeGuys — the good stuff from the vibe-coded internet';
   }
