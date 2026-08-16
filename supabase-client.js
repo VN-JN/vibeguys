@@ -3,12 +3,49 @@
   const config = window.VIBEGUYS_CONFIG || {};
   const authRedirectUrl = config.authRedirectUrl || 'https://vibeguys-gilt.vercel.app/';
   const labels = { en:['Explore','Trending','Staff Picks','Support','Sign in','Submit a vibe'], ko:['탐색','인기','스태프 픽','후원','로그인','바이브 등록'] };
+  const koreanCopy={
+    'Freshly tested tools, served daily':'매일 엄선해 소개하는 도구','Built fast. Chosen carefully.':'빠르게 만들고, 신중하게 고릅니다.',
+    'The good stuff from the vibe-coded internet':'바이브 코딩 인터넷에서 찾은 좋은 것들','Too many vibes.':'너무 많은 바이브 속에서.','We pick':'우리가 고릅니다','the good ones.':'좋은 것만.',
+    'Discover useful things people built with AI. Try them, rate them, and back the ones worth keeping around.':'AI로 만든 유용한 서비스를 발견하세요. 직접 써 보고, 평가하고, 오래 남을 제품을 후원하세요.',
+    'Explore vibes →':'바이브 둘러보기 →','Submit your vibe':'내 바이브 등록','2,400+ curious people':'2,400명 이상의 탐험가','finding their next useful thing':'다음 유용한 도구를 찾고 있어요.',
+    "TODAY'S SPECIAL":'오늘의 추천','Browse the counter':'메뉴 둘러보기','What are you in the mood for?':'오늘은 무엇이 필요하신가요?','See all vibes':'모든 바이브 보기',
+    'Make stuff':'무언가 만들기','Design, writing & creative tools':'디자인, 글쓰기, 창작 도구','Get it done':'일 해치우기','Productivity without the guilt':'부담 없이 쓰는 생산성 도구',
+    'Build better':'더 잘 만들기','Developer tools & tiny miracles':'개발 도구와 작은 기적','Just for fun':'그냥 재미로','The weird corner of the menu':'메뉴의 가장 독특한 구석',
+    'Staff tasted, staff approved':'스태프가 직접 써 보고 골랐어요','Worth a second look.':'한 번 더 볼 가치가 있어요.','No paid placement. Just tools':'유료 노출은 없습니다. 정말 좋다고 생각한','we think earn their tab.':'도구만 소개합니다.',
+    'Fresh off the grill':'갓 나온 신상','New on the menu.':'새 메뉴입니다.','Browse all 20 →':'전체 20개 보기 →','Back a build':'만드는 사람 후원하기','Found a vibe':'오래 갈 바이브를','with staying power?':'발견하셨나요?',
+    'Good small products deserve a shot. Help their makers keep building — with a clearly stated 10% platform commission.':'좋은 작은 제품은 기회가 필요합니다. 명확히 고지된 10% 플랫폼 수수료와 함께 제작자를 후원하세요.',
+    'See funding projects →':'후원 프로젝트 보기 →','Looking at the menu':'메뉴 살펴보기','Explore the menu':'메뉴 탐색','Search a name, maker, tag, or the thing you wish existed.':'이름, 제작자, 태그 또는 찾고 싶은 기능을 검색하세요.',
+    'Try ‘invoice’, ‘focus’, or ‘weird’':'‘invoice’, ‘focus’, ‘weird’를 검색해 보세요','VIBES ON THE MENU':'개의 바이브가 메뉴에 있어요','Nothing here yet.':'아직 등록된 것이 없어요.','Maybe you should build it.':'원하시는 것을 직접 만들어 보세요.',
+    'Put it on the menu →':'메뉴에 등록하기 →','Back to the menu':'메뉴로 돌아가기','Live':'운영 중','Try it ↗':'사용해 보기 ↗','Save it':'저장하기','Saved ✓':'저장됨 ✓','Review it':'후기 남기기',
+    'VibeGuys rating':'VibeGuys 평점','Taste tests':'사용 후기','Backed so far':'현재 후원액','What it does':'어떤 서비스인가요?','What people said':'사용자 후기','Write a taste test →':'후기 작성 →',
+    'Quiet vibe.':'아직 조용한 바이브예요.','Maybe it is underrated. Be the first to taste test it.':'아직 알려지지 않았을지도 몰라요. 첫 후기를 남겨 보세요.',
+    'Open for support':'후원 진행 중','Keep':'계속 만들어 갈 수 있도록','cooking.':'후원해 주세요.','Back the build in a transparent demo checkout. Platform commission is always 10%.':'투명한 데모 결제로 프로젝트를 후원하세요. 플랫폼 수수료는 항상 10%입니다.',
+    'Raised':'모인 금액','Goal':'목표 금액','Supporters':'후원자','Days left':'남은 기간','Support it →':'후원하기 →','Trust check':'신뢰 확인',
+    'Support a build':'프로젝트 후원','Give the good ones a longer runway.':'좋은 제품이 더 오래 날 수 있게 도와주세요.','Demo contributions show the 10% platform commission before you continue. No real money moves in this MVP.':'데모 후원은 계속하기 전에 10% 플랫폼 수수료를 보여줍니다. 이 MVP에서는 실제 결제가 이뤄지지 않습니다.',
+    'Back this build →':'이 프로젝트 후원 →','Where the money goes':'후원금은 어디로 가나요?','Put it on the menu':'메뉴에 등록하기','Built something?':'무언가 만드셨나요?',
+    'Tell us what it does. New vibes go to the tasting counter for a moderation check before appearing publicly.':'어떤 서비스인지 알려주세요. 신규 등록은 공개 전에 검토 과정을 거칩니다.','Demo submission only':'데모 등록 전용','Submit a Vibe':'바이브 등록',
+    'Product name':'서비스 이름','One-line description':'한 줄 설명','Website URL':'웹사이트 URL','Category':'카테고리','What problem does it solve?':'어떤 문제를 해결하나요?','Creator name':'제작자 이름','Send to the tasting counter →':'검토 대기열로 보내기 →',
+    'Admin demo':'관리자 데모','The tasting counter.':'검토 대기열','A local-only moderation view. No actions persist outside this browser session.':'로컬 데모 검토 화면입니다. 이 화면의 작업은 브라우저 밖에 저장되지 않습니다.',
+    'Vibe queue':'등록 대기열','Review moderation':'후기 검토','Reports':'신고','Needs a human look':'사람의 검토가 필요해요','Approve':'승인','Resolve':'처리','Review':'검토',
+    'Placement rules':'노출 원칙','Fast-made, thoughtfully picked.':'빠르게 만들고, 신중하게 골랐습니다.','Saved':'저장됨','Save':'저장','Sign in':'로그인','Account':'계정',
+    'Support':'후원','Explore':'탐색','Trending':'인기','Staff Picks':'스태프 픽','Free':'무료','Freemium':'프리미엄 체험','Paid':'유료','All':'전체','All platforms':'전체 플랫폼'
+  };
+  const koreanPlaceholders={'Try invoice, focus, or weird':'예: invoice, focus, weird','e.g. Invoice Snack':'예: Invoice Snack','What useful thing does it do?':'어떤 유용한 기능을 제공하나요?','https://':'https://'};
+  const originalText=new WeakMap(),originalAttributes=new WeakMap(); let localizationQueued=false;
+  function localizeDocument(){
+    const korean=document.documentElement.lang==='ko'; const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT); const nodes=[]; while(walker.nextNode())nodes.push(walker.currentNode);
+    for(const node of nodes){const parent=node.parentElement;if(!parent||['SCRIPT','STYLE'].includes(parent.tagName))continue;if(!originalText.has(node))originalText.set(node,node.nodeValue);const source=originalText.get(node);const trimmed=source.trim();const localized=koreanCopy[trimmed];const next=korean&&localized?source.replace(trimmed,localized):source;if(node.nodeValue!==next)node.nodeValue=next;}
+    for(const element of document.querySelectorAll('[placeholder],[title],[aria-label]')){let original=originalAttributes.get(element);if(!original){original={placeholder:element.getAttribute('placeholder'),title:element.getAttribute('title'),'aria-label':element.getAttribute('aria-label')};originalAttributes.set(element,original)}for(const attribute of Object.keys(original)){if(original[attribute]===null)continue;const translated=koreanCopy[original[attribute]]||koreanPlaceholders[original[attribute]];const next=korean&&translated?translated:original[attribute];if(element.getAttribute(attribute)!==next)element.setAttribute(attribute,next);}}
+    document.title=korean?'VibeGuys — 바이브 코딩 인터넷의 좋은 것들':'VibeGuys — the good stuff from the vibe-coded internet';
+  }
+  function scheduleLocalization(){if(localizationQueued)return;localizationQueued=true;queueMicrotask(()=>{localizationQueued=false;localizeDocument()})}
+  new MutationObserver(scheduleLocalization).observe(document.body,{childList:true,subtree:true,characterData:true});
   const ko = () => document.documentElement.lang === 'ko';
   function setLanguage(next) {
     localStorage.setItem('vibeguys-language', next); document.documentElement.lang=next;
     document.querySelector('#language-toggle').textContent=next==='ko'?'EN':'KO';
     document.querySelectorAll('header nav button').forEach((el,i)=>el.textContent=labels[next][i]);
-    const actions=document.querySelectorAll('.actions > button'); if(actions[1])actions[1].textContent=labels[next][4]; if(actions[3])actions[3].textContent=`${labels[next][5]} ↗`;
+    const actions=document.querySelectorAll('.actions > button'); if(actions[1])actions[1].textContent=labels[next][4]; if(actions[3])actions[3].textContent=`${labels[next][5]} ↗`; localizeDocument();
   }
   setLanguage(localStorage.getItem('vibeguys-language') || ((navigator.language||'').toLowerCase().startsWith('ko')?'ko':'en'));
   document.addEventListener('click',event=>{if(event.target.closest('[data-action="language"]'))setLanguage(ko()?'en':'ko')});
