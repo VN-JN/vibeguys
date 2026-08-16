@@ -14,6 +14,10 @@ Every submission starts private. Finished products and funding projects are both
 
 The user-facing policy text is in `LEGAL_NOTICE.md`. Have a qualified lawyer review it before public launch.
 
+## Review translation
+
+`supabase/translate-review.ts` stores a Korean or English translation beside the original review and always leaves the original available to readers. Before deploying it, add a Google Cloud Translation API key as the `GOOGLE_TRANSLATE_API_KEY` Edge Function secret and obtain explicit consent to send public review text to Google for translation. Do not put that key in `config.js`.
+
 The browser uses `signInWithOAuth({ provider: 'google' })`. It stores no Google client secret. Supabase Auth creates the session, and the database trigger adds a profile record.
 
 ## Safety and operations
