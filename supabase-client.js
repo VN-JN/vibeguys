@@ -4,15 +4,15 @@
   const authRedirectUrl = config.authRedirectUrl || 'https://vibeguys-gilt.vercel.app/';
   const labels = { en:['Explore','Trending','Staff Picks','Support','Sign in','Submit a vibe'], ko:['탐색','인기','스태프 픽','후원','로그인','바이브 등록'] };
   const koreanCopy={
-    'Freshly tested tools, served daily':'매일 엄선해 소개하는 도구','Built fast. Chosen carefully.':'빠르게 만들고, 신중하게 고릅니다.',
-    'The good stuff from the vibe-coded internet':'바이브 코딩 인터넷에서 찾은 좋은 것들','Too many vibes.':'너무 많은 바이브 속에서.','We pick':'우리가 고릅니다','the good ones.':'좋은 것만.',
-    'Discover useful things people built with AI. Try them, rate them, and back the ones worth keeping around.':'AI로 만든 유용한 서비스를 발견하세요. 직접 써 보고, 평가하고, 오래 남을 제품을 후원하세요.',
-    'Explore vibes →':'바이브 둘러보기 →','Submit your vibe':'내 바이브 등록','2,400+ curious people':'2,400명 이상의 탐험가','finding their next useful thing':'다음 유용한 도구를 찾고 있어요.',
-    "TODAY'S SPECIAL":'오늘의 추천','Browse the counter':'메뉴 둘러보기','What are you in the mood for?':'오늘은 무엇이 필요하신가요?','See all vibes':'모든 바이브 보기',
+    'Freshly tested tools, served daily':'오늘 막 구운 바이브','Built fast. Chosen carefully.':'빠르게 만들고, 제대로 고릅니다.',
+    'The good stuff from the vibe-coded internet':'바이브 코딩 씬의 엄선된 신상','Too many vibes.':'만든 건 넘치고.','We pick':'진짜는 남습니다','the good ones.':'쓸모 있는 것만.',
+    'Discover useful things people built with AI. Try them, rate them, and back the ones worth keeping around.':'AI로 만든 제품 중, 지금 바로 써볼 만한 것만 골랐습니다. 써보고, 평가하고, 오래 갈 프로젝트를 밀어주세요.',
+    'Explore vibes →':'오늘의 바이브 보기 →','Submit your vibe':'내 프로젝트 올리기','2,400+ curious people':'2,400명 이상의 얼리 유저','finding their next useful thing':'다음으로 꽂힐 도구를 찾는 중',
+    "TODAY'S SPECIAL":'오늘의 한 입','Browse the counter':'오늘의 메뉴','What are you in the mood for?':'지금 필요한 건 뭔가요?','See all vibes':'메뉴 전체 보기',
     'Make stuff':'무언가 만들기','Design, writing & creative tools':'디자인, 글쓰기, 창작 도구','Get it done':'일 해치우기','Productivity without the guilt':'부담 없이 쓰는 생산성 도구',
     'Build better':'더 잘 만들기','Developer tools & tiny miracles':'개발 도구와 작은 기적','Just for fun':'그냥 재미로','The weird corner of the menu':'메뉴의 가장 독특한 구석',
-    'Staff tasted, staff approved':'스태프가 직접 써 보고 골랐어요','Worth a second look.':'한 번 더 볼 가치가 있어요.','No paid placement. Just tools':'유료 노출은 없습니다. 정말 좋다고 생각한','we think earn their tab.':'도구만 소개합니다.',
-    'Fresh off the grill':'갓 나온 신상','New on the menu.':'새 메뉴입니다.','Browse all 20 →':'전체 20개 보기 →','Back a build':'만드는 사람 후원하기','Found a vibe':'오래 갈 바이브를','with staying power?':'발견하셨나요?',
+    'Staff tasted, staff approved':'직접 써봤고, 그래서 올립니다','Worth a second look.':'탭 하나쯤 내줄 만한 것들.','No paid placement. Just tools':'광고비는 받지 않습니다. 우리가 진짜로','we think earn their tab.':'다시 쓸 것만 올립니다.',
+    'Fresh off the grill':'방금 올라온 바이브','New on the menu.':'새로 들어왔습니다.','Browse all 20 →':'신상 전부 보기 →','Back a build':'될 놈을 밀어주자','Found a vibe':'오래 갈 느낌의','with staying power?':'프로젝트를 찾았나요?',
     'Good small products deserve a shot. Help their makers keep building — with a clearly stated 10% platform commission.':'좋은 작은 제품은 기회가 필요합니다. 명확히 고지된 10% 플랫폼 수수료와 함께 제작자를 후원하세요.',
     'See funding projects →':'후원 프로젝트 보기 →','Looking at the menu':'메뉴 살펴보기','Explore the menu':'메뉴 탐색','Search a name, maker, tag, or the thing you wish existed.':'이름, 제작자, 태그 또는 찾고 싶은 기능을 검색하세요.',
     'Try ‘invoice’, ‘focus’, or ‘weird’':'‘invoice’, ‘focus’, ‘weird’를 검색해 보세요','VIBES ON THE MENU':'개의 바이브가 메뉴에 있어요','Nothing here yet.':'아직 등록된 것이 없어요.','Maybe you should build it.':'원하시는 것을 직접 만들어 보세요.',
