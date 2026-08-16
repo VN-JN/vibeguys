@@ -1,6 +1,7 @@
 /* Browser integration. Only a Supabase publishable key is used here. */
 (async () => {
   const config = window.VIBEGUYS_CONFIG || {};
+  const authRedirectUrl = config.authRedirectUrl || 'https://vibeguys-gilt.vercel.app/';
   const labels = { en:['Explore','Trending','Staff Picks','Support','Sign in','Submit a vibe'], ko:['탐색','인기','스태프 픽','후원','로그인','바이브 등록'] };
   const ko = () => document.documentElement.lang === 'ko';
   function setLanguage(next) {
@@ -39,13 +40,13 @@
     if(!event.target.closest('[data-action="sign"]'))return;
     event.preventDefault();event.stopImmediatePropagation();const {data:{session:userSession}}=await db.auth.getSession();
     if(userSession){await db.auth.signOut();await syncSession();return}
-    const {error}=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:config.authRedirectUrl||location.origin+location.pathname}});if(error)alert(error.message);
+    const {error}=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:authRedirectUrl}});if(error)alert(error.message);
   },true);
   document.addEventListener('submit',async event=>{
     if(event.target.id!=='submit-form')return;
     event.preventDefault();event.stopImmediatePropagation();
     const {data:{user}}=await db.auth.getUser();
-    if(!user){await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:config.authRedirectUrl||location.origin+location.pathname}});return}
+    if(!user){await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:authRedirectUrl}});return}
     const form=new FormData(event.target); const slug=form.get('name').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
     const {error}=await db.from('products').insert({owner_id:user.id,slug:`${slug}-${Date.now().toString(36)}`,platform:form.get('platform')||'web',category:form.get('cat'),pricing:'free',name_en:form.get('name'),tagline_en:form.get('tag'),description_en:form.get('problem'),website_url:form.get('url'),tags:[]});
     if(error){alert(error.message);return}
