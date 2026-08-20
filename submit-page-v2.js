@@ -112,6 +112,6 @@
     dropWire(host.querySelector('[data-drop-zone="logo"]'),'logo');dropWire(host.querySelector('[data-drop-zone="projects"]'),'projects');
   }
   document.addEventListener('submit',event=>{if(event.target.id!=='submit-form'||!currentHost?.querySelector('.submit-page')||currentStep===3)return;event.preventDefault();event.stopImmediatePropagation();if(validateStep())setStep(currentStep+1)},true);
-  document.addEventListener('click',event=>{if(event.target.closest('[data-action="language"]'))setTimeout(localize,0)});
+  document.addEventListener('vibeguys:languagechange',()=>{if(currentHost?.querySelector('.submit-page'))localize()});
   window.VibeGuysSubmit={render};
 })();

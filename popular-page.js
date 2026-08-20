@@ -124,8 +124,8 @@
     if(layout){state.layout=layout.dataset.popularLayout;render();return}
     if(page){state.page=Number(page.dataset.popularPage)||1;render();return}
     if(event.target.closest('[data-popular-reset]')){reset();render();return}
-    if(event.target.closest('[data-action="language"]')&&document.querySelector('.popular-page'))setTimeout(()=>render(),0);
   });
   document.addEventListener('change',event=>{if(event.target.matches('[data-popular-sort]')){state.sort=event.target.value;state.page=1;render()}});
+  document.addEventListener('vibeguys:languagechange',()=>{if(document.querySelector('.popular-page'))render()});
   window.VibeGuysPopular={render};
 })();

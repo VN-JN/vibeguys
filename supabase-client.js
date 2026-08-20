@@ -50,14 +50,33 @@
   function scheduleLocalization(){if(localizationQueued)return;localizationQueued=true;queueMicrotask(()=>{localizationQueued=false;localizeDocument();})}
   new MutationObserver(scheduleLocalization).observe(document.body,{childList:true,subtree:true,characterData:true});
   const ko = () => document.documentElement.lang === 'ko';
-  function setLanguage(next) {
+  function setLanguageMenu(open){
+    const toggle=document.querySelector('[data-action="language"]'),menu=document.querySelector('[data-language-menu]');
+    if(!toggle||!menu)return;
+    toggle.setAttribute('aria-expanded',String(Boolean(open)));menu.hidden=!open;
+  }
+  function syncLanguageMenu(next){
+    document.querySelectorAll('[data-language-option]').forEach(option=>option.setAttribute('aria-checked',String(option.dataset.languageOption===next)));
+  }
+  function setLanguage(next,notify=true) {
+    if(!['ko','en'].includes(next))return;
+    const previous=document.documentElement.lang;
     localStorage.setItem('vibeguys-language', next); document.documentElement.lang=next;
     const languageLabel=document.querySelector('[data-language-label]'); if(languageLabel)languageLabel.textContent=next==='ko'?'KR':'EN';
     document.querySelectorAll('header nav button[data-view]').forEach((el,i)=>{if(labels[next][i])el.textContent=labels[next][i]});
-    const sign=document.querySelector('[data-action="sign"]'); if(sign&&!sign.dataset.signedIn)sign.textContent=labels[next][2]; localizeDocument();
+    const sign=document.querySelector('[data-action="sign"]'); if(sign&&!sign.dataset.signedIn)sign.textContent=labels[next][2]; syncLanguageMenu(next);localizeDocument();
+    if(notify&&previous!==next)document.dispatchEvent(new CustomEvent('vibeguys:languagechange',{detail:{language:next}}));
   }
-  setLanguage(localStorage.getItem('vibeguys-language') || ((navigator.language||'').toLowerCase().startsWith('ko')?'ko':'en'));
-  document.addEventListener('click',event=>{if(event.target.closest('[data-action="language"]'))setLanguage(ko()?'en':'ko')});
+  setLanguage(localStorage.getItem('vibeguys-language') || ((navigator.language||'').toLowerCase().startsWith('ko')?'ko':'en'),false);
+  document.addEventListener('click',event=>{
+    const toggle=event.target.closest('[data-action="language"]');
+    if(toggle){event.preventDefault();setLanguageMenu(toggle.getAttribute('aria-expanded')!=='true');return}
+    const option=event.target.closest('[data-language-option]');
+    if(option){setLanguage(option.dataset.languageOption);setLanguageMenu(false);return}
+    if(!event.target.closest('[data-language-picker]'))setLanguageMenu(false);
+  });
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!document.querySelector('[data-language-menu]')?.hidden){setLanguageMenu(false);document.querySelector('[data-action="language"]')?.focus()}});
+  window.VibeGuysLanguage={setLanguage,closeMenu:()=>setLanguageMenu(false)};
   const enabled = config.supabaseUrl && config.supabasePublishableKey && window.supabase;
   if(!enabled) return;
   const db=window.supabase.createClient(config.supabaseUrl,config.supabasePublishableKey); window.vibeSupabase=db;

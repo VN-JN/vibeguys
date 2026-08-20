@@ -216,10 +216,10 @@
     const dot=event.target.closest('[data-home-dot]');
     if(dot){const {max}=sliderMetrics();carouselOffset=Math.min((Number(dot.dataset.homeDot)||0)*CARDS_PER_SLIDE,max);syncSlider(true);return}
     if(event.target.closest('[data-home-next]')){const {max,groups}=sliderMetrics();const activeGroup=Math.min(groups-1,Math.floor(carouselOffset/CARDS_PER_SLIDE));const nextGroup=activeGroup>=groups-1?0:activeGroup+1;carouselOffset=Math.min(nextGroup*CARDS_PER_SLIDE,max);syncSlider(true);return}
-    if(event.target.closest('[data-view="home"]'))setTimeout(render,0);
-    if(event.target.closest('[data-action="language"]'))setTimeout(render,0);
   },true);
   let resizeTimer;
   window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(document.querySelector('.home-v3'))syncSlider(false)},100)});
+  document.addEventListener('vibeguys:languagechange',()=>{if(document.querySelector('.home-v3'))render()});
+  window.VibeGuysHome={render};
   render();
 })();

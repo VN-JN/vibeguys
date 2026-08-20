@@ -1,7 +1,16 @@
-/* Prevent the legacy demo router from replacing the reference landing page. */
+/* Keep home navigation inside the current document to avoid a full-page flash. */
 document.addEventListener('click', event => {
-  if (!event.target.closest('[data-view="home"]')) return
+  const trigger = event.target.closest('[data-view="home"]')
+  if (!trigger) return
   event.preventDefault()
   event.stopImmediatePropagation()
-  window.location.assign('/')
+  window.VibeGuysLanguage?.closeMenu()
+  if (document.querySelector('.home-v3')) {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    return
+  }
+  if (window.VibeGuysHome?.render) {
+    window.VibeGuysHome.render()
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }
 }, true)

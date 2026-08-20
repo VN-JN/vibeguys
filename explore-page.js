@@ -104,8 +104,8 @@
     if(price){state.price=price.dataset.explorePrice;render();return}
     if(layout){state.layout=layout.dataset.exploreLayout;render();return}
     if(event.target.closest('[data-explore-reset]')){reset();render();return}
-    if(event.target.closest('[data-action="language"]')&&document.querySelector('.explore-page'))setTimeout(()=>render(),0);
   });
   document.addEventListener('change',event=>{if(event.target.matches('[data-explore-sort]')){state.sort=event.target.value;render()}});
+  document.addEventListener('vibeguys:languagechange',()=>{if(document.querySelector('.explore-page'))render()});
   window.VibeGuysExplore={render};
 })();
