@@ -136,10 +136,10 @@
           <p>${t('하루에도 수많은 바이브코딩 서비스가 쏟아집니다.<br>VibeGuys는 직접 써볼 만한 웹과 앱만 골라 소개합니다.','New vibe-coded services launch every day.<br>VibeGuys picks the web and app products actually worth trying.')}</p>
           <button class="home-submit" data-view="submit"><span>＋</span>${t('제품 등록','SUBMIT')}</button>
           <div class="home-stats">
-            <article><i>◇</i><div><b>1,248+</b><span>${t('등록된 제품','listed products')}</span></div></article>
-            <article><i>♙</i><div><b>328K+</b><span>${t('누적 사용자','total users')}</span></div></article>
-            <article><i>◌</i><div><b>12.6K+</b><span>${t('리뷰 & 피드백','reviews & feedback')}</span></div></article>
-            <article><i>⬡</i><div><b>100%</b><span>${t('보안 사전검사','security pre-check')}</span></div></article>
+            <article><i class="stat-icon stat-icon-package" aria-hidden="true"></i><div><b>1,248+</b><span>${t('등록된 제품','listed products')}</span></div></article>
+            <article><i class="stat-icon stat-icon-users" aria-hidden="true"></i><div><b>328K+</b><span>${t('누적 사용자','total users')}</span></div></article>
+            <article><i class="stat-icon stat-icon-feedback" aria-hidden="true"></i><div><b>12.6K+</b><span>${t('리뷰 & 피드백','reviews & feedback')}</span></div></article>
+            <article><i class="stat-icon stat-icon-security" aria-hidden="true"></i><div><b>100%</b><span>${t('보안 사전검사','security pre-check')}</span></div></article>
           </div>
         </div>
         <div class="home-showcase" aria-label="${t('추천 제품','Featured products')}">
