@@ -121,17 +121,35 @@
     if(userSession){await db.auth.signOut();await syncSession();return}
     const {error}=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:authRedirectUrl}});if(error)alert(error.message);
   },true);
+  async function uploadSubmissionMedia(userId,productSlug,form){
+    const isUpload=file=>typeof File!=='undefined'&&file instanceof File&&file.size>0;
+    const logo=form.get('logo_file');
+    const projectImages=form.getAll('project_images').filter(isUpload);
+    const uploads=[];const uploadedPaths=[];
+    if(isUpload(logo))uploads.push({file:logo,path:`${userId}/${productSlug}/logo-${logo.name.replace(/[^a-zA-Z0-9._-]/g,'-')}`});
+    projectImages.forEach((file,index)=>uploads.push({file,path:`${userId}/${productSlug}/screenshots/${index+1}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'-')}`}));
+    if(!uploads.length)return {headerImageUrl:null,screenshotUrls:[],uploadedPaths};
+    const urls=[];
+    for(const item of uploads){
+      const {error}=await db.storage.from('product-media').upload(item.path,item.file,{cacheControl:'3600',contentType:item.file.type,upsert:false});
+      if(error){if(uploadedPaths.length)await db.storage.from('product-media').remove(uploadedPaths);throw new Error(error.message)}
+      uploadedPaths.push(item.path);
+      const {data}=db.storage.from('product-media').getPublicUrl(item.path);urls.push(data.publicUrl);
+    }
+    return {headerImageUrl:isUpload(logo)?urls[0]:null,screenshotUrls:isUpload(logo)?urls.slice(1):urls,uploadedPaths};
+  }
   document.addEventListener('submit',async event=>{
     if(event.target.id!=='submit-form')return;
     event.preventDefault();event.stopImmediatePropagation();
     const {data:{user}}=await db.auth.getUser();
     if(!user){await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:authRedirectUrl}});return}
-    const form=new FormData(event.target); const name=String(form.get('name')||''); const normalized=name.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g)||'vibe';
+    const form=new FormData(event.target); const name=String(form.get('name')||''); const normalized=name.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g)||'vibe'; const productSlug=`${normalized}-${Date.now().toString(36)}`;
     const listingType=String(form.get('listing_type')||'live'); const websiteUrl=String(form.get('url')||'').trim()||null;
     let domain=null;try{domain=websiteUrl?new URL(websiteUrl).hostname.toLowerCase().replace(/^www\\./,''):null}catch{} if(domain){const {data:existing}=await db.from('products').select('id').eq('canonical_domain',domain).maybeSingle();if(existing){alert(ko()?'이미 등록된 웹사이트입니다. 도메인 소유권 인증 후 기존 등록을 관리할 수 있습니다.':'This website is already listed. Verify domain ownership to manage the existing listing.');return}}
-    const screenshots=String(form.get('screenshot_urls')||'').split(',').map(url=>url.trim()).filter(url=>url.startsWith('https://'));
-    const {data:product,error}=await db.from('products').insert({owner_id:user.id,slug:`${normalized}-${Date.now().toString(36)}`,platform:form.get('platform')||'web',listing_type:listingType,category:form.get('cat'),pricing:'free',name_en:name,tagline_en:form.get('tag'),description_en:form.get('problem'),website_url:websiteUrl,developer_name:form.get('maker'),header_image_url:String(form.get('header_image_url')||'').trim()||null,screenshot_urls:screenshots,release_stage:form.get('release_stage')||'released',tags:[],terms_version:'2026-08-17',terms_accepted_at:new Date().toISOString()}).select('id').single();
-    if(error){alert(error.message);return}
+    let media;try{media=await uploadSubmissionMedia(user.id,productSlug,form)}catch(uploadError){alert((ko()?'이미지 업로드에 실패했습니다. 잠시 후 다시 시도해주세요.\n':'Image upload failed. Please try again.\n')+uploadError.message);return}
+    const tags=String(form.get('tags')||'').split(',').map(tag=>tag.trim()).filter(Boolean).slice(0,5);
+    const {data:product,error}=await db.from('products').insert({owner_id:user.id,slug:productSlug,platform:form.get('platform')||'web',listing_type:listingType,category:form.get('cat'),pricing:'free',name_en:name,tagline_en:form.get('tag'),description_en:form.get('problem'),website_url:websiteUrl,developer_name:form.get('maker'),header_image_url:media.headerImageUrl,screenshot_urls:media.screenshotUrls,release_stage:form.get('release_stage')||'released',tags,terms_version:'2026-08-17',terms_accepted_at:new Date().toISOString()}).select('id').single();
+    if(error){if(media.uploadedPaths.length)await db.storage.from('product-media').remove(media.uploadedPaths);alert(error.message);return}
     if(listingType==='funding'){
       const rewardAmount=Number(form.get('reward_amount')); const {error:projectError}=await db.from('projects').insert({product_id:product.id,funding_goal:Number(form.get('funding_goal')),deadline:new Date(String(form.get('funding_deadline'))).toISOString(),reward_summary:form.get('reward_description'),prototype_url:websiteUrl,reward_tiers:[{amount:rewardAmount,title:form.get('reward_title'),description:form.get('reward_description')}]});
       if(projectError){alert(projectError.message);return}
