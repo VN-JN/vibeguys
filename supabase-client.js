@@ -2,7 +2,7 @@
 (async () => {
   const config = window.VIBEGUYS_CONFIG || {};
   const authRedirectUrl = config.authRedirectUrl || 'https://vibeguys-gilt.vercel.app/';
-  const labels = { en:['Explore','Trending','Staff Picks','Support','Sign in','Submit a vibe'], ko:['탐색','인기','스태프 픽','후원','로그인','바이브 등록'] };
+  const labels = { en:['Explore','Trending','Staff Picks','Sign in','Submit a vibe'], ko:['탐색','인기','스태프 픽','로그인','바이브 등록'] };
   const koreanCopy={
     'Freshly tested tools, served daily':'오늘 갓 튀긴 바이브','Built fast. Chosen carefully.':'빨리 만들고, 맛있게 고릅니다.',
     'The good stuff from the vibe-coded internet':'쏟아지는 바이브 속, 오늘의 제대로 된 한 입','Too many vibes.':'신상은 넘치고.','We pick':'맛있는 것만 남깁니다','the good ones.':'다시 찾게 될 것만.',
@@ -55,7 +55,7 @@
     localStorage.setItem('vibeguys-language', next); document.documentElement.lang=next;
     document.querySelector('#language-toggle').textContent=next==='ko'?'EN':'KO';
     document.querySelectorAll('header nav button').forEach((el,i)=>el.textContent=labels[next][i]);
-    const actions=document.querySelectorAll('.actions > button'); if(actions[1])actions[1].textContent=labels[next][4]; if(actions[3])actions[3].textContent=`${labels[next][5]} ↗`; localizeDocument();
+    const actions=document.querySelectorAll('.actions > button'); if(actions[1])actions[1].textContent=labels[next][3]; if(actions[3])actions[3].textContent=`${labels[next][4]} ↗`; localizeDocument();
   }
   setLanguage(localStorage.getItem('vibeguys-language') || ((navigator.language||'').toLowerCase().startsWith('ko')?'ko':'en'));
   document.addEventListener('click',event=>{if(event.target.closest('[data-action="language"]'))setLanguage(ko()?'en':'ko')});
