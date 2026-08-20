@@ -15,10 +15,13 @@
   ];
   let platform='all';
   let carouselOffset=0;
+  let dragState=null;
+  let suppressCardClick=false;
   const isKo=()=>document.documentElement.lang==='ko';
   const t=(ko,en)=>isKo()?ko:en;
   const platformLabel=value=>({web:'WEB',app:'APP',both:'WEB + APP'}[value]||'ALL');
   const escape=value=>String(value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+  const visibleCards=()=>window.matchMedia('(max-width:480px)').matches?1:window.matchMedia('(max-width:720px)').matches?2:4;
 
   function featureCard(product){
     return `<article class="home-product-card" data-a="detail" data-id="${product.id}">
@@ -48,13 +51,83 @@
     document.querySelectorAll('[data-shell]').forEach(node=>{if(copy[node.dataset.shell])node.textContent=copy[node.dataset.shell]});
   }
 
+  function sliderMetrics(){
+    const viewport=app.querySelector('[data-home-viewport]');
+    const track=app.querySelector('[data-home-track]');
+    const cards=track?[...track.children]:[];
+    const gap=track?parseFloat(getComputedStyle(track).gap)||12:12;
+    const step=cards[0]?cards[0].getBoundingClientRect().width+gap:0;
+    const max=Math.max(0,cards.length-Math.min(visibleCards(),cards.length));
+    return {viewport,track,cards,step,max};
+  }
+
+  function syncSlider(animate=true){
+    const {track,step,max}=sliderMetrics();
+    if(!track)return;
+    carouselOffset=Math.max(0,Math.min(carouselOffset,max));
+    track.style.transition=animate?'transform .34s cubic-bezier(.22,.72,.24,1)':'none';
+    track.style.transform=`translate3d(${-carouselOffset*step}px,0,0)`;
+    const dots=app.querySelector('.home-dots');
+    if(dots){
+      const count=max+1;
+      if(dots.children.length!==count)dots.innerHTML=Array.from({length:count},(_,index)=>`<button class="${index===carouselOffset?'active':''}" data-home-dot="${index}" aria-label="${t(`${index+1}번째 슬라이드`, `Slide ${index+1}`)}"></button>`).join('');
+      [...dots.children].forEach((dot,index)=>{dot.classList.toggle('active',index===carouselOffset);dot.setAttribute('aria-current',index===carouselOffset?'true':'false')});
+    }
+    const next=app.querySelector('[data-home-next]');
+    if(next)next.hidden=max===0;
+  }
+
+  function beginDrag(event){
+    if(event.button!==0&&event.pointerType==='mouse')return;
+    const metrics=sliderMetrics();
+    if(!metrics.viewport||metrics.max===0)return;
+    dragState={pointerId:event.pointerId,startX:event.clientX,lastX:event.clientX,baseX:-carouselOffset*metrics.step,moved:false,...metrics};
+    metrics.viewport.setPointerCapture?.(event.pointerId);
+    metrics.viewport.classList.add('dragging');
+    metrics.track.style.transition='none';
+  }
+
+  function moveDrag(event){
+    if(!dragState||dragState.pointerId!==event.pointerId)return;
+    const delta=event.clientX-dragState.startX;
+    dragState.lastX=event.clientX;
+    if(Math.abs(delta)>5)dragState.moved=true;
+    const minX=-dragState.max*dragState.step;
+    const nextX=Math.max(minX,Math.min(0,dragState.baseX+delta));
+    dragState.track.style.transform=`translate3d(${nextX}px,0,0)`;
+    if(dragState.moved&&event.pointerType==='mouse')event.preventDefault();
+  }
+
+  function endDrag(event){
+    if(!dragState||dragState.pointerId!==event.pointerId)return;
+    const state=dragState;
+    const delta=event.type==='pointercancel'?0:state.lastX-state.startX;
+    const threshold=Math.min(64,state.step*.2);
+    if(delta<=-threshold)carouselOffset=Math.min(state.max,carouselOffset+1);
+    else if(delta>=threshold)carouselOffset=Math.max(0,carouselOffset-1);
+    state.viewport.classList.remove('dragging');
+    if(state.viewport.hasPointerCapture?.(event.pointerId))state.viewport.releasePointerCapture(event.pointerId);
+    suppressCardClick=state.moved;
+    dragState=null;
+    syncSlider(true);
+    if(suppressCardClick)setTimeout(()=>{suppressCardClick=false},0);
+  }
+
+  function wireSlider(){
+    const viewport=app.querySelector('[data-home-viewport]');
+    if(!viewport)return;
+    viewport.addEventListener('pointerdown',beginDrag);
+    viewport.addEventListener('pointermove',moveDrag);
+    viewport.addEventListener('pointerup',endDrag);
+    viewport.addEventListener('pointercancel',endDrag);
+    requestAnimationFrame(()=>syncSlider(false));
+  }
+
   function render(){
     document.body.dataset.activeView='home';
     document.querySelectorAll('body>header nav [data-view]').forEach(button=>button.classList.remove('active'));
     syncShell();
     const filtered=products.filter(product=>platform==='all'||product.platform===platform);
-    const ordered=filtered.length?filtered.map((_,index)=>filtered[(index+carouselOffset)%filtered.length]):[];
-    const featured=ordered.slice(0,4);
     const filters=[['all',t('전체','ALL')],['web','WEB'],['app','APP'],['both','WEB + APP']];
     app.innerHTML=`<main class="reference-home home-v3">
       <section class="home-hero">
@@ -71,9 +144,9 @@
         </div>
         <div class="home-showcase" aria-label="${t('추천 제품','Featured products')}">
           <div class="home-showcase-filters">${filters.map(([value,label])=>`<button class="${platform===value?'active':''}" data-home-platform="${value}">${label}</button>`).join('')}</div>
-          <div class="home-featured-grid">${featured.map(featureCard).join('')}</div>
-          ${filtered.length>4?`<button class="home-carousel-next" data-home-next aria-label="${t('다음 제품','Next products')}">›</button>`:''}
-          <div class="home-dots" aria-hidden="true"><i class="active"></i><i></i><i></i><i></i><i></i></div>
+          <div class="home-featured-viewport" data-home-viewport><div class="home-featured-grid" data-home-track>${filtered.map(featureCard).join('')}</div></div>
+          <button class="home-carousel-next" data-home-next aria-label="${t('다음 제품','Next products')}">›</button>
+          <div class="home-dots"></div>
         </div>
       </section>
       <section class="home-directory">
@@ -82,14 +155,20 @@
         <div class="home-directory-column"><header><div><h2><span>↗</span> TRENDING THIS WEEK</h2><p>${t('이번 주 가장 뜨거운 서비스','The hottest products this week')}</p></div><button data-view="trending">${t('모두 보기','View all')} ›</button></header><div class="home-rank-list trending">${rankRows([products[2],products[1],products[4],products[0],products[7]],'views')}</div></div>
       </section>
     </main>`;
+    wireSlider();
   }
 
   document.addEventListener('click',event=>{
+    if(suppressCardClick&&event.target.closest('.home-featured-viewport')){event.preventDefault();event.stopImmediatePropagation();suppressCardClick=false;return}
     const filter=event.target.closest('[data-home-platform]');
     if(filter){platform=filter.dataset.homePlatform;carouselOffset=0;render();return}
-    if(event.target.closest('[data-home-next]')){const count=products.filter(product=>platform==='all'||product.platform===platform).length;carouselOffset=count?(carouselOffset+1)%count:0;render();return}
+    const dot=event.target.closest('[data-home-dot]');
+    if(dot){carouselOffset=Number(dot.dataset.homeDot)||0;syncSlider(true);return}
+    if(event.target.closest('[data-home-next]')){const {max}=sliderMetrics();carouselOffset=max?carouselOffset>=max?0:carouselOffset+1:0;syncSlider(true);return}
     if(event.target.closest('[data-view="home"]'))setTimeout(render,0);
     if(event.target.closest('[data-action="language"]'))setTimeout(render,0);
-  });
+  },true);
+  let resizeTimer;
+  window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(document.querySelector('.home-v3'))syncSlider(false)},100)});
   render();
 })();
