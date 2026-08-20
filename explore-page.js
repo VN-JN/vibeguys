@@ -15,14 +15,12 @@
     title:'EXPLORE',lead:'새로 등록되고 검증된 서비스를 확인해보세요.',sub:'매일 업데이트되는 웹, 앱, AI 도구를 만나보세요.',
     all:'전체',web:'웹',app:'앱',both:'웹 + 앱',filter:'필터',reset:'초기화',category:'카테고리',platform:'서비스 유형',stage:'상태',price:'가격',sort:'정렬',
     newest:'최신 등록순',popular:'인기순',reviews:'리뷰순',released:'정식 출시',beta:'베타',building:'개발 중',free:'무료',freemium:'부분 유료',paid:'유료',
-    empty:'아직 공개된 서비스가 없습니다.',emptySub:'승인된 서비스가 생기면 이곳에서 가장 먼저 소개합니다.',security:'보안 검증 완료',securityCopy:'모든 서비스는 자동 보안 검사와 기본 검토를 거쳐 등록됩니다.',details:'자세히 보기 →',
-    subscribe:'새로운 서비스를 놓치지 마세요',subscribeCopy:'매주 엄선된 새로운 서비스와 업데이트를 이메일로 받아보세요.',email:'이메일 주소 입력',subscribeButton:'구독하기',subscribed:'구독 신청이 접수됐습니다.',hours:'시간 전'
+    empty:'아직 공개된 서비스가 없습니다.',emptySub:'승인된 서비스가 생기면 이곳에서 가장 먼저 소개합니다.',security:'보안 검증 완료',securityCopy:'모든 서비스는 자동 보안 검사와 기본 검토를 거쳐 등록됩니다.',details:'자세히 보기 →',hours:'시간 전'
   }:{
     title:'EXPLORE',lead:'Discover newly listed and verified products.',sub:'Fresh web, app, and AI tools are added every day.',
     all:'ALL',web:'WEB',app:'APP',both:'WEB + APP',filter:'FILTERS',reset:'RESET',category:'CATEGORY',platform:'SERVICE TYPE',stage:'STATUS',price:'PRICE',sort:'SORT',
     newest:'NEWEST',popular:'POPULAR',reviews:'MOST REVIEWED',released:'RELEASED',beta:'BETA',building:'IN DEVELOPMENT',free:'FREE',freemium:'FREEMIUM',paid:'PAID',
-    empty:'No published products yet.',emptySub:'Approved products will appear here first.',security:'SECURITY CHECKED',securityCopy:'Every product passes an automated security scan and a basic review before listing.',details:'LEARN MORE →',
-    subscribe:'DON’T MISS THE FRESH ONES',subscribeCopy:'Get a weekly email with carefully selected products and updates.',email:'Email address',subscribeButton:'SUBSCRIBE',subscribed:'Subscription request received.',hours:'H AGO'
+    empty:'No published products yet.',emptySub:'Approved products will appear here first.',security:'SECURITY CHECKED',securityCopy:'Every product passes an automated security scan and a basic review before listing.',details:'LEARN MORE →',hours:'H AGO'
   };
   const categoryLabel=value=>{
     if(!ko())return value;
@@ -77,11 +75,11 @@
     document.body.dataset.activeView='explore';
     document.querySelectorAll('body>header nav [data-view]').forEach(button=>button.classList.toggle('active',button.dataset.view==='explore'));
     host.innerHTML=`<main class="explore-page">
+      <header class="explore-heading"><h1>${t.title}</h1><p>${t.lead}<br>${t.sub}</p></header>
+      <nav class="explore-category-bar" aria-label="${t.category}">${optionButton('category','all',t.all)}${topCategories.map(category=>optionButton('category',category,categoryLabel(category))).join('')}</nav>
+      <div class="catalog-controls-row"><div class="explore-list-controls"><span>${visible.length} PRODUCTS</span><label><span class="sr-only">${t.sort}</span><select data-explore-sort><option value="newest" ${state.sort==='newest'?'selected':''}>${t.newest}</option><option value="popular" ${state.sort==='popular'?'selected':''}>${t.popular}</option><option value="reviews" ${state.sort==='reviews'?'selected':''}>${t.reviews}</option></select></label><div class="explore-layout-toggle"><button data-explore-layout="grid" class="${state.layout==='grid'?'active':''}" aria-label="Grid view">▦</button><button data-explore-layout="list" class="${state.layout==='list'?'active':''}" aria-label="List view">☷</button></div></div><span aria-hidden="true"></span></div>
       <div class="explore-layout">
         <section class="explore-content">
-          <header class="explore-heading"><h1>${t.title}</h1><p>${t.lead}<br>${t.sub}</p></header>
-          <nav class="explore-category-bar" aria-label="${t.category}">${optionButton('category','all',t.all)}${topCategories.map(category=>optionButton('category',category,categoryLabel(category))).join('')}</nav>
-          <div class="explore-list-controls"><span>${visible.length} ${ko()?'PRODUCTS':'PRODUCTS'}</span><label><span class="sr-only">${t.sort}</span><select data-explore-sort><option value="newest" ${state.sort==='newest'?'selected':''}>${t.newest}</option><option value="popular" ${state.sort==='popular'?'selected':''}>${t.popular}</option><option value="reviews" ${state.sort==='reviews'?'selected':''}>${t.reviews}</option></select></label><div class="explore-layout-toggle"><button data-explore-layout="grid" class="${state.layout==='grid'?'active':''}" aria-label="Grid view">▦</button><button data-explore-layout="list" class="${state.layout==='list'?'active':''}" aria-label="List view">☷</button></div></div>
           ${visible.length?`<section class="explore-grid ${state.layout==='list'?'is-list':''}">${visible.map(card).join('')}</section>`:`<section class="explore-empty"><h2>${t.empty}</h2><p>${t.emptySub}</p><button data-view="submit">${ko()?'제품 등록하기 →':'SUBMIT A PRODUCT →'}</button></section>`}
         </section>
         <aside class="explore-sidebar">
@@ -93,7 +91,6 @@
             ${filterGroup(t.sort,`<label class="explore-filter-sort"><select data-explore-sort><option value="newest" ${state.sort==='newest'?'selected':''}>${t.newest}</option><option value="popular" ${state.sort==='popular'?'selected':''}>${t.popular}</option><option value="reviews" ${state.sort==='reviews'?'selected':''}>${t.reviews}</option></select></label>`)}
           </section>
           <section class="explore-aside-card security"><div><h2>${t.security}</h2><p>${t.securityCopy}</p><button type="button">${t.details}</button></div><span class="security-window" aria-hidden="true"><i>✓</i></span></section>
-          <section class="explore-aside-card newsletter"><h2>${t.subscribe}</h2><p>${t.subscribeCopy}</p><form data-explore-newsletter><input type="email" required placeholder="${t.email}"><button>${t.subscribeButton}</button></form></section>
         </aside>
       </div>
     </main>`;
@@ -110,6 +107,5 @@
     if(event.target.closest('[data-action="language"]')&&document.querySelector('.explore-page'))setTimeout(()=>render(),0);
   });
   document.addEventListener('change',event=>{if(event.target.matches('[data-explore-sort]')){state.sort=event.target.value;render()}});
-  document.addEventListener('submit',event=>{if(!event.target.matches('[data-explore-newsletter]'))return;event.preventDefault();event.target.reset();const toast=document.querySelector('#toast');if(toast){toast.textContent=copy().subscribed;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2400)}});
   window.VibeGuysExplore={render};
 })();
