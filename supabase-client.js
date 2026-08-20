@@ -2,7 +2,7 @@
 (async () => {
   const config = window.VIBEGUYS_CONFIG || {};
   const authRedirectUrl = config.authRedirectUrl || 'https://vibeguys-gilt.vercel.app/';
-  const labels = { en:['Explore','Popular','Sign in','Submit your product'], ko:['탐색','인기','로그인','제품 등록'] };
+  const labels = { en:['Explore','Popular','Sign in'], ko:['탐색','인기','로그인'] };
   const koreanCopy={
     'Freshly tested tools, served daily':'오늘 갓 튀긴 바이브','Built fast. Chosen carefully.':'빨리 만들고, 맛있게 고릅니다.',
     'The good stuff from the vibe-coded internet':'쏟아지는 바이브 속, 오늘의 제대로 된 한 입','Too many vibes.':'신상은 넘치고.','We pick':'맛있는 것만 남깁니다','the good ones.':'다시 찾게 될 것만.',
@@ -52,9 +52,9 @@
   const ko = () => document.documentElement.lang === 'ko';
   function setLanguage(next) {
     localStorage.setItem('vibeguys-language', next); document.documentElement.lang=next;
-    document.querySelector('#language-toggle').textContent=next==='ko'?'EN':'KO';
-    document.querySelectorAll('header nav button').forEach((el,i)=>el.textContent=labels[next][i]);
-    const actions=document.querySelectorAll('.actions > button'); if(actions[1])actions[1].textContent=labels[next][2]; if(actions[3])actions[3].textContent=labels[next][3]; localizeDocument();
+    const languageLabel=document.querySelector('[data-language-label]'); if(languageLabel)languageLabel.textContent=next==='ko'?'KR':'EN';
+    document.querySelectorAll('header nav button[data-view]').forEach((el,i)=>{if(labels[next][i])el.textContent=labels[next][i]});
+    const sign=document.querySelector('[data-action="sign"]'); if(sign&&!sign.dataset.signedIn)sign.textContent=labels[next][2]; localizeDocument();
   }
   setLanguage(localStorage.getItem('vibeguys-language') || ((navigator.language||'').toLowerCase().startsWith('ko')?'ko':'en'));
   document.addEventListener('click',event=>{if(event.target.closest('[data-action="language"]'))setLanguage(ko()?'en':'ko')});
@@ -62,7 +62,7 @@
   if(!enabled) return;
   const db=window.supabase.createClient(config.supabaseUrl,config.supabasePublishableKey); window.vibeSupabase=db;
   let products=[]; let catalogueMode='explore';
-  async function syncSession(){const {data:{session}}=await db.auth.getSession();const button=document.querySelector('[data-action="sign"]');if(button)button.textContent=session?(session.user.user_metadata.full_name||'Account'):labels[document.documentElement.lang][2]}
+  async function syncSession(){const {data:{session}}=await db.auth.getSession();const button=document.querySelector('[data-action="sign"]');if(button){button.dataset.signedIn=session?'true':'';button.textContent=session?(session.user.user_metadata.full_name||'Account'):labels[document.documentElement.lang][2]}}
   async function loadProducts(){
     const baseFields='id,slug,platform,category,pricing,name_en,name_ko,tagline_en,tagline_ko,description_en,description_ko,website_url,tags,featured,published_at,visit_count,review_count,profiles!products_owner_id_fkey(display_name)';
     const storefrontFields=',developer_name,header_image_url,screenshot_urls,release_stage,site_verified_at,site_verified_by';
