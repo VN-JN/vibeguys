@@ -107,7 +107,6 @@
             ${filterGroup(t.platform,optionButton('platform','all',t.all)+optionButton('platform','web',t.web)+optionButton('platform','app',t.app)+optionButton('platform','both',t.both))}
             ${filterGroup(t.stage,optionButton('stage','all',t.all)+optionButton('stage','released',t.released)+optionButton('stage','beta',t.beta)+optionButton('stage','in_development',t.building))}
             ${filterGroup(t.price,optionButton('price','all',t.all)+optionButton('price','free',t.free)+optionButton('price','freemium',t.freemium)+optionButton('price','paid',t.paid))}
-            ${filterGroup(t.sort,`<label class="explore-filter-sort"><select data-popular-sort><option value="rank" ${state.sort==='rank'?'selected':''}>${t.rank}</option><option value="newest" ${state.sort==='newest'?'selected':''}>${t.newest}</option><option value="reviews" ${state.sort==='reviews'?'selected':''}>${t.reviews}</option></select></label>`)}
           </section>
           <section class="explore-aside-card security"><div><h2>${t.security}</h2><p>${t.securityCopy}</p><button type="button">${t.details}</button></div><span class="security-window" aria-hidden="true"><i>✓</i></span></section>
         </aside>
