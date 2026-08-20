@@ -7,6 +7,7 @@
 5. In Google Cloud Console, add the Supabase callback URL shown in the Google provider panel to the OAuth client's authorized redirect URIs.
 6. Set the application Site URL to the production app URL before launch.
 7. Apply `supabase/20260817193000_submission_moderation.sql` after the base schema when setting up a fresh project. It adds the funding-project path, recorded policy acceptance, automated URL pre-check, and human moderation queue.
+8. Apply `supabase/20260820110000_storefront_and_domain_claims.sql`, then deploy `supabase/site-ownership.ts` as the `site-ownership` Edge Function with JWT verification enabled. It prevents duplicate canonical domains and enables a maker to claim an existing listing by serving the generated `vibeguys-site-verification` meta tag on its HTTPS homepage.
 
 ## Moderation flow
 
@@ -25,4 +26,5 @@ The browser uses `signInWithOAuth({ provider: 'google' })`. It stores no Google 
 - Every exposed table has Row Level Security enabled. Do not disable it to fix an error.
 - The `published` product policy makes discovery public; authors can only modify their own pending submissions.
 - Admin approval, live payment confirmation, refunds, and sponsored placement require server-side/Edge Function code using a secret key; they are intentionally not browser operations.
+- Domain verification fetches only the registered public HTTPS origin, rejects local/private hostnames, does not follow redirects, and waits five seconds at most. A successful token check transfers listing ownership; treat the Edge Function service key as a secret.
 - Run the SQL in a disposable project first, then check the Database Linter/Advisors before production.
