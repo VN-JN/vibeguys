@@ -15,6 +15,7 @@
   ];
   let platform='all';
   let carouselOffset=0;
+  const CARDS_PER_SLIDE=4;
   let dragState=null;
   let suppressCardClick=false;
   const isKo=()=>document.documentElement.lang==='ko';
@@ -58,30 +59,32 @@
     const gap=track?parseFloat(getComputedStyle(track).gap)||12:12;
     const step=cards[0]?cards[0].getBoundingClientRect().width+gap:0;
     const max=Math.max(0,cards.length-Math.min(visibleCards(),cards.length));
-    return {viewport,track,cards,step,max};
+    const groups=Math.max(1,Math.ceil(cards.length/CARDS_PER_SLIDE));
+    return {viewport,track,cards,step,max,groups};
   }
 
   function syncSlider(animate=true){
-    const {track,step,max}=sliderMetrics();
+    const {track,step,max,groups}=sliderMetrics();
     if(!track)return;
     carouselOffset=Math.max(0,Math.min(carouselOffset,max));
-    track.style.transition=animate?'transform .34s cubic-bezier(.22,.72,.24,1)':'none';
+    track.style.transition=animate?'transform .46s cubic-bezier(.22,1,.36,1)':'none';
     track.style.transform=`translate3d(${-carouselOffset*step}px,0,0)`;
     const dots=app.querySelector('.home-dots');
     if(dots){
-      const count=max+1;
-      if(dots.children.length!==count)dots.innerHTML=Array.from({length:count},(_,index)=>`<button class="${index===carouselOffset?'active':''}" data-home-dot="${index}" aria-label="${t(`${index+1}번째 슬라이드`, `Slide ${index+1}`)}"></button>`).join('');
-      [...dots.children].forEach((dot,index)=>{dot.classList.toggle('active',index===carouselOffset);dot.setAttribute('aria-current',index===carouselOffset?'true':'false')});
+      const activeGroup=Math.min(groups-1,Math.floor(carouselOffset/CARDS_PER_SLIDE));
+      dots.hidden=groups<=1;
+      if(dots.children.length!==groups)dots.innerHTML=Array.from({length:groups},(_,index)=>`<button data-home-dot="${index}" aria-label="${t(`${index+1}번째 제품 묶음`, `Product group ${index+1}`)}"></button>`).join('');
+      [...dots.children].forEach((dot,index)=>{dot.classList.toggle('active',index===activeGroup);dot.setAttribute('aria-current',index===activeGroup?'true':'false')});
     }
     const next=app.querySelector('[data-home-next]');
-    if(next)next.hidden=max===0;
+    if(next)next.hidden=groups<=1;
   }
 
   function beginDrag(event){
     if(event.button!==0&&event.pointerType==='mouse')return;
     const metrics=sliderMetrics();
     if(!metrics.viewport||metrics.max===0)return;
-    dragState={pointerId:event.pointerId,startX:event.clientX,lastX:event.clientX,baseX:-carouselOffset*metrics.step,moved:false,...metrics};
+    dragState={pointerId:event.pointerId,startX:event.clientX,lastX:event.clientX,lastTime:performance.now(),velocityX:0,baseX:-carouselOffset*metrics.step,moved:false,...metrics};
     metrics.viewport.setPointerCapture?.(event.pointerId);
     metrics.viewport.classList.add('dragging');
     metrics.track.style.transition='none';
@@ -90,21 +93,33 @@
   function moveDrag(event){
     if(!dragState||dragState.pointerId!==event.pointerId)return;
     const delta=event.clientX-dragState.startX;
+    const now=performance.now();
+    const elapsed=Math.max(1,now-dragState.lastTime);
+    const instantaneousVelocity=(event.clientX-dragState.lastX)/elapsed;
+    dragState.velocityX=dragState.velocityX*.68+instantaneousVelocity*.32;
     dragState.lastX=event.clientX;
+    dragState.lastTime=now;
     if(Math.abs(delta)>5)dragState.moved=true;
     const minX=-dragState.max*dragState.step;
-    const nextX=Math.max(minX,Math.min(0,dragState.baseX+delta));
+    let nextX=dragState.baseX+delta;
+    if(nextX>0)nextX*=.3;
+    else if(nextX<minX)nextX=minX+(nextX-minX)*.3;
     dragState.track.style.transform=`translate3d(${nextX}px,0,0)`;
-    if(dragState.moved&&event.pointerType==='mouse')event.preventDefault();
+    if(dragState.moved)event.preventDefault();
   }
 
   function endDrag(event){
     if(!dragState||dragState.pointerId!==event.pointerId)return;
     const state=dragState;
     const delta=event.type==='pointercancel'?0:state.lastX-state.startX;
-    const threshold=Math.min(64,state.step*.2);
-    if(delta<=-threshold)carouselOffset=Math.min(state.max,carouselOffset+1);
-    else if(delta>=threshold)carouselOffset=Math.max(0,carouselOffset-1);
+    let targetOffset=carouselOffset;
+    if(event.type!=='pointercancel'&&state.moved){
+      const projectedX=state.baseX+delta+state.velocityX*180;
+      targetOffset=Math.round(-projectedX/state.step);
+      const threshold=Math.min(52,state.step*.14);
+      if(Math.abs(delta)>=threshold&&targetOffset===carouselOffset)targetOffset+=delta<0?1:-1;
+    }
+    carouselOffset=Math.max(0,Math.min(targetOffset,state.max));
     state.viewport.classList.remove('dragging');
     if(state.viewport.hasPointerCapture?.(event.pointerId))state.viewport.releasePointerCapture(event.pointerId);
     suppressCardClick=state.moved;
@@ -145,7 +160,7 @@
         <div class="home-showcase" aria-label="${t('추천 제품','Featured products')}">
           <div class="home-showcase-filters">${filters.map(([value,label])=>`<button class="${platform===value?'active':''}" data-home-platform="${value}">${label}</button>`).join('')}</div>
           <div class="home-featured-viewport" data-home-viewport><div class="home-featured-grid" data-home-track>${filtered.map(featureCard).join('')}</div></div>
-          <button class="home-carousel-next" data-home-next aria-label="${t('다음 제품','Next products')}">›</button>
+          <button class="home-carousel-next" data-home-next aria-label="${t('다음 제품 묶음','Next product group')}"><span aria-hidden="true"></span></button>
           <div class="home-dots"></div>
         </div>
       </section>
@@ -163,8 +178,8 @@
     const filter=event.target.closest('[data-home-platform]');
     if(filter){platform=filter.dataset.homePlatform;carouselOffset=0;render();return}
     const dot=event.target.closest('[data-home-dot]');
-    if(dot){carouselOffset=Number(dot.dataset.homeDot)||0;syncSlider(true);return}
-    if(event.target.closest('[data-home-next]')){const {max}=sliderMetrics();carouselOffset=max?carouselOffset>=max?0:carouselOffset+1:0;syncSlider(true);return}
+    if(dot){const {max}=sliderMetrics();carouselOffset=Math.min((Number(dot.dataset.homeDot)||0)*CARDS_PER_SLIDE,max);syncSlider(true);return}
+    if(event.target.closest('[data-home-next]')){const {max,groups}=sliderMetrics();const activeGroup=Math.min(groups-1,Math.floor(carouselOffset/CARDS_PER_SLIDE));const nextGroup=activeGroup>=groups-1?0:activeGroup+1;carouselOffset=Math.min(nextGroup*CARDS_PER_SLIDE,max);syncSlider(true);return}
     if(event.target.closest('[data-view="home"]'))setTimeout(render,0);
     if(event.target.closest('[data-action="language"]'))setTimeout(render,0);
   },true);
