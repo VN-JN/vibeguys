@@ -2,7 +2,7 @@
 (async () => {
   const config = window.VIBEGUYS_CONFIG || {};
   const authRedirectUrl = config.authRedirectUrl || 'https://vibeguys-gilt.vercel.app/';
-  const labels = { en:['Explore','Popular','Staff Picks','Web','App','Sign in','Submit your product'], ko:['탐색','인기','스태프 픽','웹','앱','로그인','제품 등록'] };
+  const labels = { en:['Explore','Popular','Sign in','Submit your product'], ko:['탐색','인기','로그인','제품 등록'] };
   const koreanCopy={
     'Freshly tested tools, served daily':'오늘 갓 튀긴 바이브','Built fast. Chosen carefully.':'빨리 만들고, 맛있게 고릅니다.',
     'The good stuff from the vibe-coded internet':'쏟아지는 바이브 속, 오늘의 제대로 된 한 입','Too many vibes.':'신상은 넘치고.','We pick':'맛있는 것만 남깁니다','the good ones.':'다시 찾게 될 것만.',
@@ -11,7 +11,6 @@
     "TODAY'S SPECIAL":'오늘의 스페셜','Browse the counter':'오늘의 카운터','What are you in the mood for?':'오늘은 어떤 메뉴가 당기나요?','See all vibes':'메뉴판 전체 보기',
     'Make stuff':'무언가 만들기','Design, writing & creative tools':'디자인, 글쓰기, 창작 도구','Get it done':'일 해치우기','Productivity without the guilt':'부담 없이 쓰는 생산성 도구',
     'Build better':'더 잘 만들기','Developer tools & tiny miracles':'개발 도구와 작은 기적','Just for fun':'그냥 재미로','The weird corner of the menu':'메뉴의 가장 독특한 구석',
-    'Staff tasted, staff approved':'주방 테스트 완료','Worth a second look.':'다시 주문할 맛.','No paid placement. Just tools':'협찬 메뉴는 올리지 않습니다. 우리가 진짜로','we think earn their tab.':'다시 찾을 것만 올립니다.',
     'Fresh off the grill':'방금 튀겨 나온 신상','New on the menu.':'새 메뉴 나왔습니다.','Browse all 20 →':'신상 메뉴 전부 보기 →','Back a build':'맛있는 빌드를 밀어주자','Found a vibe':'계속 만들 가치 있는','with staying power?':'메뉴를 찾았나요?',
     'Good small products deserve a shot. Help their makers keep building — with a clearly stated 10% platform commission.':'좋은 작은 제품은 기회가 필요합니다. 명확히 고지된 10% 플랫폼 수수료와 함께 제작자를 후원하세요.',
     'See funding projects →':'후원 프로젝트 보기 →','Looking at the menu':'메뉴 살펴보기','Explore the menu':'메뉴 탐색','Search a name, maker, tag, or the thing you wish existed.':'이름, 제작자, 태그 또는 찾고 싶은 기능을 검색하세요.',
@@ -28,7 +27,7 @@
     'Admin demo':'관리자 데모','The tasting counter.':'검토 대기열','A local-only moderation view. No actions persist outside this browser session.':'로컬 데모 검토 화면입니다. 이 화면의 작업은 브라우저 밖에 저장되지 않습니다.',
     'Vibe queue':'등록 대기열','Review moderation':'후기 검토','Reports':'신고','Needs a human look':'사람의 검토가 필요해요','Approve':'승인','Resolve':'처리','Review':'검토',
     'Placement rules':'노출 원칙','Fast-made, thoughtfully picked.':'빠르게 만들고, 신중하게 골랐습니다.','Saved':'저장됨','Save':'저장','Sign in':'로그인','Account':'계정',
-    'Support':'후원','Explore':'탐색','Trending':'인기','Staff Picks':'스태프 픽','Free':'무료','Freemium':'프리미엄 체험','Paid':'유료','All':'전체','All platforms':'전체 플랫폼',
+    'Support':'후원','Explore':'탐색','Trending':'인기','Free':'무료','Freemium':'프리미엄 체험','Paid':'유료','All':'전체','All platforms':'전체 플랫폼',
     'AI that helps':'AI가 돕습니다','Tools worth using':'쓸 만한 도구','Built by people with ideas':'아이디어 있는 사람들이 만든 것','Fresh from the internet':'인터넷에서 갓 온 것',
     'Browse all 20':'전체 20개 보기','Try':'사용해 보기','Productivity':'생산성','Design':'디자인','Developer Tools':'개발 도구','Lifestyle':'라이프스타일','Utilities':'유틸리티','Weird & Fun':'독특하고 재미있는 것',
     'Your calm command center for the projects that actually matter.':'정말 중요한 프로젝트를 위한 차분한 통합 공간입니다.','A calm command center for the projects that actually matter.':'중요한 프로젝트를 위한 차분한 통합 공간입니다.',
@@ -55,7 +54,7 @@
     localStorage.setItem('vibeguys-language', next); document.documentElement.lang=next;
     document.querySelector('#language-toggle').textContent=next==='ko'?'EN':'KO';
     document.querySelectorAll('header nav button').forEach((el,i)=>el.textContent=labels[next][i]);
-    const actions=document.querySelectorAll('.actions > button'); if(actions[1])actions[1].textContent=labels[next][5]; if(actions[3])actions[3].textContent=labels[next][6]; localizeDocument();
+    const actions=document.querySelectorAll('.actions > button'); if(actions[1])actions[1].textContent=labels[next][2]; if(actions[3])actions[3].textContent=labels[next][3]; localizeDocument();
   }
   setLanguage(localStorage.getItem('vibeguys-language') || ((navigator.language||'').toLowerCase().startsWith('ko')?'ko':'en'));
   document.addEventListener('click',event=>{if(event.target.closest('[data-action="language"]'))setLanguage(ko()?'en':'ko')});
@@ -63,9 +62,9 @@
   if(!enabled) return;
   const db=window.supabase.createClient(config.supabaseUrl,config.supabasePublishableKey); window.vibeSupabase=db;
   let products=[]; let catalogueMode='explore';
-  async function syncSession(){const {data:{session}}=await db.auth.getSession();const button=document.querySelector('[data-action="sign"]');if(button)button.textContent=session?(session.user.user_metadata.full_name||'Account'):labels[document.documentElement.lang][5]}
+  async function syncSession(){const {data:{session}}=await db.auth.getSession();const button=document.querySelector('[data-action="sign"]');if(button)button.textContent=session?(session.user.user_metadata.full_name||'Account'):labels[document.documentElement.lang][2]}
   async function loadProducts(){
-    const baseFields='id,slug,platform,category,pricing,name_en,name_ko,tagline_en,tagline_ko,description_en,description_ko,website_url,tags,staff_pick,featured,published_at,visit_count,review_count,profiles!products_owner_id_fkey(display_name)';
+    const baseFields='id,slug,platform,category,pricing,name_en,name_ko,tagline_en,tagline_ko,description_en,description_ko,website_url,tags,featured,published_at,visit_count,review_count,profiles!products_owner_id_fkey(display_name)';
     const storefrontFields=',developer_name,header_image_url,screenshot_urls,release_stage,site_verified_at,site_verified_by';
     let response=await db.from('products').select(baseFields+storefrontFields).eq('status','published').order('published_at',{ascending:false});
     if(response.error?.code==='42703')response=await db.from('products').select(baseFields).eq('status','published').order('published_at',{ascending:false});
@@ -77,13 +76,13 @@
   function catalogue(mode='explore',fixedPlatform=''){
     catalogueMode=mode;
     const host=document.querySelector('#app'); const query=(document.querySelector('#supabase-search')?.value||'').toLowerCase(); const platform=fixedPlatform||document.querySelector('#platform-filter')?.value||'all'; const category=document.querySelector('#remote-category')?.value||'All';
-    const ranked=mode==='trending'?products.filter(p=>(p.visit_count||0)>=30||(p.review_count||0)>=3).sort((a,b)=>((b.visit_count||0)+((b.review_count||0)*10))-((a.visit_count||0)+((a.review_count||0)*10))):mode==='staff'?products.filter(p=>p.staff_pick):products;
+    const ranked=mode==='trending'?products.filter(p=>(p.visit_count||0)>=30||(p.review_count||0)>=3).sort((a,b)=>((b.visit_count||0)+((b.review_count||0)*10))-((a.visit_count||0)+((a.review_count||0)*10))):products;
     const visible=ranked.filter(p=>(platform==='all'||p.platform===platform||p.platform==='both')&&(category==='All'||p.category===category)&&(!query||[value(p,'name'),value(p,'tagline'),p.category,(p.tags||[]).join(' ')].join(' ').toLowerCase().includes(query)));
     document.body.dataset.activeView=mode;document.querySelectorAll('body>header nav [data-view]').forEach(button=>button.classList.toggle('active',button.dataset.view===mode));
     if(mode==='explore'&&window.VibeGuysExplore){window.VibeGuysExplore.render(ranked,{source:'supabase',reset:true});return}
     if(mode==='trending'&&window.VibeGuysPopular){window.VibeGuysPopular.render(ranked,{source:'supabase'});return}
     const categories=['All',...new Set(products.map(p=>p.category))];
-    const copy=mode==='trending'?{eyebrow:ko()?'검증된 반응':'Earned attention',title:ko()?'인기 있는 바이브':'Popular vibes',lead:ko()?'최근 7일 내 VibeGuys 방문 30회 또는 리뷰 3개 이상인 승인작만 보여드립니다.':'Only approved listings with 30 VibeGuys visits or 3 reviews appear here.'}:mode==='staff'?{eyebrow:ko()?'운영자 검토':'Editorial review',title:ko()?'스태프 픽':'Staff picks',lead:ko()?'운영자가 직접 검토해 고른 승인작입니다.':'Approved listings selected through editorial review.'}:{eyebrow:ko()?'새로 승인된 서비스':'Freshly approved',title:ko()?'새로운 바이브':'New vibes',lead:ko()?'검토와 보안 사전검사를 마친 최신 등록작입니다.':'The newest listings that passed pre-check and administrator review.'};
+    const copy=mode==='trending'?{eyebrow:ko()?'검증된 반응':'Earned attention',title:ko()?'인기 있는 바이브':'Popular vibes',lead:ko()?'최근 7일 내 VibeGuys 방문 30회 또는 리뷰 3개 이상인 승인작만 보여드립니다.':'Only approved listings with 30 VibeGuys visits or 3 reviews appear here.'}:{eyebrow:ko()?'새로 승인된 서비스':'Freshly approved',title:ko()?'새로운 바이브':'New vibes',lead:ko()?'검토와 보안 사전검사를 마친 최신 등록작입니다.':'The newest listings that passed pre-check and administrator review.'};
     host.innerHTML=`<section class="page"><div class="page-head"><p class="eyebrow">${copy.eyebrow}</p><h1>${copy.title}</h1><p class="lead">${copy.lead}</p></div><div class="filters"><input id="supabase-search" placeholder="${ko()?'예: invoice, focus, weird':'Try invoice, focus, or weird'}"><select id="platform-filter"><option value="all" ${platform==='all'?'selected':''}>${ko()?'전체 플랫폼':'All platforms'}</option><option value="web" ${platform==='web'?'selected':''}>Web</option><option value="app" ${platform==='app'?'selected':''}>App</option><option value="both" ${platform==='both'?'selected':''}>Web + App</option></select><select id="remote-category">${categories.map(x=>`<option>${x}</option>`).join('')}</select></div><p class="count">${visible.length} ${ko()?'개의 바이브':'VIBES ON THE MENU'}</p>${visible.length?`<div class="grid">${visible.map(p=>`<article class="card"><div class="card-top"><span class="icon" style="--color:#d94b42">${p.platform==='app'?'A':p.platform==='both'?'↔':'W'}</span><span class="tag">${p.platform==='both'?'WEB + APP':p.platform.toUpperCase()}</span></div><h3>${value(p,'name')}</h3><p class="summary">${value(p,'tagline')}</p><div class="card-foot"><small>${p.category} · ${p.pricing}<br>${ko()?'방문':'Visits'} ${p.visit_count||0} · ${ko()?'리뷰':'Reviews'} ${p.review_count||0}</small><span><button class="small" data-remote-review="${p.id}">${ko()?'리뷰':'Reviews'}</button>${p.website_url?`<a class="small primary" data-product-visit="${p.id}" href="${p.website_url}" target="_blank" rel="noreferrer">${ko()?'사용해 보기 ↗':'Try it ↗'}</a>`:''}</span></div></article>`).join('')}</div>`:`<div class="empty"><h2>${ko()?'아직 없어요.':'Nothing here yet.'}</h2><p>${mode==='trending'?(ko()?'기준을 충족한 인기 등록작이 아직 없습니다.':'No approved listing has met the popularity threshold yet.'):(ko()?'만들어 보시는 건 어때요?':'Maybe you should build it.')}</p></div>`}</section>`;
     host.querySelectorAll('.card').forEach((card,index)=>{card.dataset.storeProduct=visible[index]?.id||'';card.tabIndex=0});
   }
@@ -114,7 +113,7 @@
     form.addEventListener('change',event=>{if(event.target.name==='listing_type')sync()}); sync();
   }
   document.addEventListener('click',async event=>{
-    const nav=event.target.closest('[data-view="explore"],[data-view="trending"],[data-view="staff"]');
+    const nav=event.target.closest('[data-view="explore"],[data-view="trending"]');
     if(nav){event.preventDefault();event.stopImmediatePropagation();await loadProducts();catalogue(nav.dataset.view);window.scrollTo(0,0);return}
     if(event.target.closest('[data-view="submit"]'))setTimeout(addSubmissionFields,0);
     if(!event.target.closest('[data-action="sign"]'))return;

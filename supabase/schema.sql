@@ -34,7 +34,6 @@ create table public.products (
   tags text[] not null default '{}',
   status public.product_status not null default 'pending',
   featured boolean not null default false,
-  staff_pick boolean not null default false,
   published_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
