@@ -151,8 +151,8 @@
       </section>
       <section class="home-directory">
         <div class="home-directory-column home-explore-preview"><header><div><h2>EXPLORE <i>NEW</i></h2><p>${t('새로 등록되고 검증된 서비스','Newly listed and checked products')}</p></div><button data-view="explore">${t('모두 보기','View all')} ›</button></header><div class="home-mini-grid">${products.slice(4,8).map(miniCard).join('')}</div></div>
-        <div class="home-directory-column home-popular-preview"><header><div><h2><span>♨</span> POPULAR</h2><p>${t('실제 반응이 좋은 서비스','Products with real momentum')}</p></div><button data-view="trending">${t('모두 보기','View all')} ›</button></header><div class="home-rank-list">${rankRows([products[6],products[0],products[2],products[1],products[3]])}</div></div>
-        <div class="home-directory-column"><header><div><h2><span>↗</span> TRENDING THIS WEEK</h2><p>${t('이번 주 가장 뜨거운 서비스','The hottest products this week')}</p></div><button data-view="trending">${t('모두 보기','View all')} ›</button></header><div class="home-rank-list trending">${rankRows([products[2],products[1],products[4],products[0],products[7]],'views')}</div></div>
+        <div class="home-directory-column home-popular-preview"><header><div><h2><span class="section-icon section-icon-popular" aria-hidden="true"></span>POPULAR</h2><p>${t('실제 반응이 좋은 서비스','Products with real momentum')}</p></div><button data-view="trending">${t('모두 보기','View all')} ›</button></header><div class="home-rank-list">${rankRows([products[6],products[0],products[2],products[1],products[3]])}</div></div>
+        <div class="home-directory-column"><header><div><h2><span class="section-icon section-icon-trending" aria-hidden="true"></span>TRENDING THIS WEEK</h2><p>${t('이번 주 가장 뜨거운 서비스','The hottest products this week')}</p></div><button data-view="trending">${t('모두 보기','View all')} ›</button></header><div class="home-rank-list trending">${rankRows([products[2],products[1],products[4],products[0],products[7]],'views')}</div></div>
       </section>
     </main>`;
     wireSlider();
