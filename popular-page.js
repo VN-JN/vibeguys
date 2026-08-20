@@ -8,7 +8,7 @@
     'assets/product-dashboard-thumbnail-v1.png'
   ];
   const categoryOrder=['Developer Tools','Productivity','Design','Marketing','AI Tools','Business','Education','Entertainment','Finance','Health','Lifestyle','Utilities','Community','Weird & Fun'];
-  const state={items:[],options:{},platform:'all',category:'all',stage:'all',price:'all',sort:'rank',layout:'grid',page:1};
+  const state={items:[],options:{},platform:'all',category:'all',stage:'all',price:'all',sort:'rank',layout:'grid',page:1,rankMap:new Map()};
   const escapeHtml=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
   const locale=()=>document.documentElement.lang==='ko';
   const copy=()=>locale()?{
@@ -17,14 +17,14 @@
     sub:'웹과 앱을 한곳에서 비교하고, 지금 가장 주목받는 제품을 만나보세요.',
     all:'전체',web:'웹',app:'앱',both:'웹 + 앱',filter:'필터',reset:'초기화',category:'카테고리',platform:'서비스 유형',stage:'상태',price:'가격',sort:'정렬',
     rank:'인기순',newest:'최신 등록순',reviews:'리뷰순',released:'정식 출시',beta:'베타',building:'개발 중',free:'무료',freemium:'부분 유료',paid:'유료',
-    empty:'아직 인기 기준을 충족한 제품이 없습니다.',views:'방문',reviewLabel:'리뷰',security:'보안 검증 완료',securityCopy:'모든 서비스는 자동 보안 검사와 기본 검토를 거쳐 등록됩니다.',details:'자세히 보기 →'
+    empty:'아직 인기 기준을 충족한 제품이 없습니다.',views:'방문',reviewLabel:'리뷰',rankLabel:'인기 순위',security:'보안 검증 완료',securityCopy:'모든 서비스는 자동 보안 검사와 기본 검토를 거쳐 등록됩니다.',details:'자세히 보기 →'
   }:{
     title:'POPULAR',
     lead:'Products that earned real attention from real users.',
     sub:'Compare web and app products together and find what people are returning to.',
     all:'ALL',web:'WEB',app:'APP',both:'WEB + APP',filter:'FILTERS',reset:'RESET',category:'CATEGORY',platform:'SERVICE TYPE',stage:'STATUS',price:'PRICE',sort:'SORT',
     rank:'POPULAR',newest:'NEWEST',reviews:'MOST REVIEWED',released:'RELEASED',beta:'BETA',building:'IN DEVELOPMENT',free:'FREE',freemium:'FREEMIUM',paid:'PAID',
-    empty:'No product has met the popularity threshold yet.',views:'VISITS',reviewLabel:'REVIEWS',security:'SECURITY CHECKED',securityCopy:'Every product passes an automated security scan and a basic review before listing.',details:'LEARN MORE →'
+    empty:'No product has met the popularity threshold yet.',views:'VISITS',reviewLabel:'REVIEWS',rankLabel:'POPULARITY RANK',security:'SECURITY CHECKED',securityCopy:'Every product passes an automated security scan and a basic review before listing.',details:'LEARN MORE →'
   };
   const categoryLabel=value=>{
     if(!locale())return value;
@@ -38,6 +38,7 @@
   const reviewsOf=item=>Number(item.review_count??(Array.isArray(item.reviews)?item.reviews.length:item.reviews)??0);
   const visitsOf=item=>Number(item.visit_count??item.visits??item.trend??0);
   const rankOf=item=>visitsOf(item)+(reviewsOf(item)*10);
+  const rankKey=item=>String(item.id||item.slug||nameOf(item)||'');
   const ratingOf=item=>{
     if(Number.isFinite(Number(item.rating))&&Number(item.rating)>0)return Number(item.rating).toFixed(1);
     const rows=Array.isArray(item.reviews)?item.reviews:[];
@@ -50,9 +51,10 @@
   const card=(item,index)=>{
     const t=copy(),platform=platformOf(item),badge=platform==='both'?t.both:platform==='app'?t.app:t.web;
     const id=escapeHtml(item.id||item.slug||'');
+    const rank=state.rankMap.get(rankKey(item))||index+1;
     const source=state.options.source==='supabase'?`data-store-product="${id}"`:`data-a="detail" data-id="${id}"`;
     return `<article class="popular-card" ${source} tabindex="0">
-      <div class="popular-shot tone-${index%8}"><img src="${escapeHtml(shotOf(item,index))}" alt="" loading="lazy"><span>${badge}</span></div>
+      <div class="popular-shot tone-${index%8}"><b class="popular-rank-badge" aria-label="${t.rankLabel} ${rank}">${String(rank).padStart(2,'0')}</b><img src="${escapeHtml(shotOf(item,index))}" alt="" loading="lazy"><span>${badge}</span></div>
       <div class="popular-card-copy">
         <h2>${escapeHtml(nameOf(item)||'Untitled')}</h2>
         <p>${escapeHtml(taglineOf(item)||'')}</p>
@@ -69,6 +71,7 @@
   function render(items=state.items,options={}){
     if(options.reset)reset();
     state.items=items||state.items||[];state.options={...state.options,...options};
+    state.rankMap=new Map([...state.items].sort((a,b)=>rankOf(b)-rankOf(a)).map((item,index)=>[rankKey(item),index+1]));
     const t=copy();
     const foundCategories=[...new Set(state.items.map(item=>item.category).filter(Boolean))];
     const categories=[...new Set([...categoryOrder,...foundCategories])];

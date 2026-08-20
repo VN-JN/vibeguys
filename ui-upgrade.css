@@ -41,6 +41,7 @@ body>header nav button.active:after{background:var(--red);bottom:-10px;content:"
 .popular-shot{aspect-ratio:1.67;background:#ece9e2;border-bottom:1px solid var(--line);overflow:hidden;position:relative}
 .popular-shot img{display:block;height:100%;object-fit:cover;width:100%}
 .popular-shot span{background:#fffaf4;border:1px solid #efc8c4;border-radius:2px;color:var(--red);font:700 8px/1 var(--mono);left:8px;padding:4px 5px;position:absolute;top:8px;z-index:1}
+.popular-rank-badge{align-items:center;background:var(--red);border-radius:3px;color:#fff;display:flex;font:800 12px/1 var(--mono);height:27px;justify-content:center;position:absolute;right:8px;top:8px;width:36px;z-index:2}
 .popular-card:nth-child(5n+2) .popular-shot img{filter:hue-rotate(42deg) saturate(.9)}
 .popular-card:nth-child(5n+3) .popular-shot img{filter:hue-rotate(103deg) saturate(.75) brightness(1.08)}
 .popular-card:nth-child(5n+4) .popular-shot img{filter:hue-rotate(205deg) saturate(.85)}

@@ -18,9 +18,14 @@
   const CARDS_PER_SLIDE=4;
   let dragState=null;
   let suppressCardClick=false;
+  let trendingOffset=0;
+  let trendingTimer=null;
+  const TRENDING_REFRESH_MS=9000;
   const isKo=()=>document.documentElement.lang==='ko';
   const t=(ko,en)=>isKo()?ko:en;
   const platformLabel=value=>({web:'WEB',app:'APP',both:'WEB + APP'}[value]||'ALL');
+  const metricNumber=value=>{const text=String(value||'0').toLowerCase();return (parseFloat(text)||0)*(text.includes('k')?1000:1)};
+  const popularItems=()=>[...products].sort((a,b)=>(metricNumber(b.views)+(Number(b.likes)||0)*10+Number(b.rating)*100)-(metricNumber(a.views)+(Number(a.likes)||0)*10+Number(a.rating)*100)).slice(0,4);
   const escape=value=>String(value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
   const visibleCards=()=>window.matchMedia('(max-width:480px)').matches?1:window.matchMedia('(max-width:720px)').matches?2:4;
 
@@ -36,8 +41,36 @@
     return `<article class="home-mini-card" data-a="detail" data-id="${product.id}"><div class="home-mini-shot"><img src="${product.image}" alt=""><span>${platformLabel(product.platform)}</span></div><h3>${escape(product.name)}</h3><p>${escape(isKo()?product.ko:product.en)}</p><footer><span>◉ ${product.views}</span><strong>★ ${product.rating}</strong></footer></article>`;
   }
 
+  function popularCard(product,index){
+    return `<article class="home-mini-card home-popular-card" data-a="detail" data-id="${product.id}"><div class="home-mini-shot"><b class="home-card-rank" aria-label="${t('인기 순위','Popularity rank')} ${index+1}">${String(index+1).padStart(2,'0')}</b><img src="${product.image}" alt=""><span>${platformLabel(product.platform)}</span></div><h3>${escape(product.name)}</h3><p>${escape(isKo()?product.ko:product.en)}</p><footer><span>◉ ${product.views}</span><strong>★ ${product.rating}</strong></footer></article>`;
+  }
+
   function rankRows(items,metric='rating'){
     return items.map((product,index)=>`<article class="home-rank-row" data-a="detail" data-id="${product.id}"><b>${index+1}</b><img src="${product.image}" alt=""><strong>${escape(product.name)}</strong><span>${metric==='views'?`◉ ${product.views}`:`◉ ${product.views}　★ ${product.rating}`}</span></article>`).join('');
+  }
+
+  function trendingItems(){
+    const pool=[products[2],products[1],products[4],products[0],products[7],products[6],products[3],products[5]];
+    return Array.from({length:5},(_,index)=>pool[(trendingOffset+index)%pool.length]);
+  }
+
+  function scheduleTrendingRefresh(){
+    clearTimeout(trendingTimer);
+    trendingTimer=setTimeout(()=>refreshTrending(),TRENDING_REFRESH_MS);
+  }
+
+  function refreshTrending(){
+    const list=app.querySelector('[data-home-trending-list]');
+    if(!list)return;
+    trendingOffset=(trendingOffset+3)%products.length;
+    list.classList.remove('is-refreshing');
+    void list.offsetWidth;
+    list.innerHTML=rankRows(trendingItems(),'views');
+    list.classList.add('is-refreshing');
+    const button=app.querySelector('[data-home-trending-refresh]');
+    button?.classList.add('is-spinning');
+    setTimeout(()=>{list.classList.remove('is-refreshing');button?.classList.remove('is-spinning')},520);
+    scheduleTrendingRefresh();
   }
 
   function syncShell(){
@@ -139,6 +172,7 @@
   }
 
   function render(){
+    clearTimeout(trendingTimer);
     document.body.dataset.activeView='home';
     document.querySelectorAll('body>header nav [data-view]').forEach(button=>button.classList.remove('active'));
     syncShell();
@@ -166,17 +200,19 @@
       </section>
       <section class="home-directory">
         <div class="home-directory-column home-explore-preview"><header><div><h2>EXPLORE <i>NEW</i></h2><p>${t('새로 등록되고 검증된 서비스','Newly listed and checked products')}</p></div><button data-view="explore">${t('모두 보기','View all')} ›</button></header><div class="home-mini-grid">${products.slice(4,8).map(miniCard).join('')}</div></div>
-        <div class="home-directory-column home-popular-preview"><header><div><h2><span class="section-icon section-icon-popular" aria-hidden="true"></span>POPULAR</h2><p>${t('실제 반응이 좋은 서비스','Products with real momentum')}</p></div><button data-view="trending">${t('모두 보기','View all')} ›</button></header><div class="home-rank-list">${rankRows([products[6],products[0],products[2],products[1],products[3]])}</div></div>
-        <div class="home-directory-column"><header><div><h2><span class="section-icon section-icon-trending" aria-hidden="true"></span>TRENDING THIS WEEK</h2><p>${t('이번 주 가장 뜨거운 서비스','The hottest products this week')}</p></div><button data-view="trending">${t('모두 보기','View all')} ›</button></header><div class="home-rank-list trending">${rankRows([products[2],products[1],products[4],products[0],products[7]],'views')}</div></div>
+        <div class="home-directory-column home-popular-preview"><header><div><h2><span class="section-icon section-icon-popular" aria-hidden="true"></span>POPULAR</h2><p>${t('실제 반응이 좋은 서비스','Products with real momentum')}</p></div><button data-view="trending">${t('모두 보기','View all')} ›</button></header><div class="home-mini-grid home-popular-grid">${popularItems().map(popularCard).join('')}</div></div>
+        <div class="home-directory-column home-trending-preview"><header><div><h2><span class="section-icon section-icon-trending" aria-hidden="true"></span>TRENDING THIS WEEK</h2><p>${t('이번 주 가장 뜨거운 서비스','The hottest products this week')}</p></div><div class="home-section-actions"><button class="home-trending-refresh" data-home-trending-refresh aria-label="${t('트렌드 새로고침','Refresh trends')}"><span aria-hidden="true">↻</span></button><button data-view="trending">${t('모두 보기','View all')} ›</button></div></header><div class="home-rank-list trending" data-home-trending-list aria-live="polite">${rankRows(trendingItems(),'views')}</div></div>
       </section>
     </main>`;
     wireSlider();
+    scheduleTrendingRefresh();
   }
 
   document.addEventListener('click',event=>{
     if(suppressCardClick&&event.target.closest('.home-featured-viewport')){event.preventDefault();event.stopImmediatePropagation();suppressCardClick=false;return}
     const filter=event.target.closest('[data-home-platform]');
     if(filter){platform=filter.dataset.homePlatform;carouselOffset=0;render();return}
+    if(event.target.closest('[data-home-trending-refresh]')){refreshTrending();return}
     const dot=event.target.closest('[data-home-dot]');
     if(dot){const {max}=sliderMetrics();carouselOffset=Math.min((Number(dot.dataset.homeDot)||0)*CARDS_PER_SLIDE,max);syncSlider(true);return}
     if(event.target.closest('[data-home-next]')){const {max,groups}=sliderMetrics();const activeGroup=Math.min(groups-1,Math.floor(carouselOffset/CARDS_PER_SLIDE));const nextGroup=activeGroup>=groups-1?0:activeGroup+1;carouselOffset=Math.min(nextGroup*CARDS_PER_SLIDE,max);syncSlider(true);return}
