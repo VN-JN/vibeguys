@@ -48,7 +48,7 @@
     for(const element of document.querySelectorAll('[placeholder],[title],[aria-label]')){let original=originalAttributes.get(element);if(!original){original={placeholder:element.getAttribute('placeholder'),title:element.getAttribute('title'),'aria-label':element.getAttribute('aria-label')};originalAttributes.set(element,original)}for(const attribute of Object.keys(original)){if(original[attribute]===null)continue;const translated=koreanCopy[original[attribute]]||koreanPlaceholders[original[attribute]];const next=korean&&translated?translated:original[attribute];if(element.getAttribute(attribute)!==next)element.setAttribute(attribute,next);}}
     document.title=korean?'VibeGuys — 바이브 코딩 인터넷의 좋은 것들':'VibeGuys — the good stuff from the vibe-coded internet';
   }
-  function scheduleLocalization(){if(localizationQueued)return;localizationQueued=true;queueMicrotask(()=>{localizationQueued=false;localizeDocument()})}
+  function scheduleLocalization(){if(localizationQueued)return;localizationQueued=true;queueMicrotask(()=>{localizationQueued=false;localizeDocument();})}
   new MutationObserver(scheduleLocalization).observe(document.body,{childList:true,subtree:true,characterData:true});
   const ko = () => document.documentElement.lang === 'ko';
   function setLanguage(next) {
@@ -104,8 +104,8 @@
     form.addEventListener('change',event=>{if(event.target.name==='listing_type')sync()}); sync();
   }
   document.addEventListener('click',async event=>{
-    const nav=event.target.closest('[data-view="explore"],[data-view="trending"],[data-view="staff"],[data-view="web"],[data-view="app"]');
-    if(nav){event.preventDefault();event.stopImmediatePropagation();await loadProducts();catalogue(['web','app'].includes(nav.dataset.view)?'explore':nav.dataset.view,['web','app'].includes(nav.dataset.view)?nav.dataset.view:'');window.scrollTo(0,0);return}
+    const nav=event.target.closest('[data-view="explore"],[data-view="trending"],[data-view="staff"]');
+    if(nav){event.preventDefault();event.stopImmediatePropagation();await loadProducts();catalogue(nav.dataset.view);window.scrollTo(0,0);return}
     if(event.target.closest('[data-view="submit"]'))setTimeout(addSubmissionFields,0);
     if(!event.target.closest('[data-action="sign"]'))return;
     event.preventDefault();event.stopImmediatePropagation();const {data:{session:userSession}}=await db.auth.getSession();
