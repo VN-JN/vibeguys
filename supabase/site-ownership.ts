@@ -2,7 +2,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const corsHeaders={'Access-Control-Allow-Origin':'https://vibeguys-gilt.vercel.app','Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type','Content-Type':'application/json'}
 const privateHost=(h:string)=>h==='localhost'||h.endsWith('.local')||h.endsWith('.internal')||/^(127\.|0\.0\.0\.0|10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(h)
-const tag=(html:string,token:string)=>html.toLowerCase().includes('vibeguys-site-verification')&&html.includes(token)
+const tag=(html:string,token:string)=>{const escaped=token.replace(/[.*+?^$()|[\]\\]/g,'\\$&');return new RegExp('<meta[^>]+name=[\"\\\\']vibeguys-site-verification[\"\\\\'][^>]+content=[\"\\\\']'+escaped+'[\"\\\\']','i').test(html)||new RegExp('<meta[^>]+content=[\"\\\\']'+escaped+'[\"\\\\'][^>]+name=[\"\\\\']vibeguys-site-verification[\"\\\\']','i').test(html)}
 
 Deno.serve(async req=>{
   if(req.method==='OPTIONS')return new Response('ok',{headers:corsHeaders})
