@@ -5,13 +5,13 @@
   <meta name="description" content="VibeGuys — human-picked tools from the vibe-coded internet.">
   <title>VibeGuys — the good stuff from the vibe-coded internet</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="moderation.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="moderation.css"><link rel="stylesheet" href="ui-upgrade.css">
 </head>
 <body>
   <div class="topline">Freshly tested tools, served daily <span>✦</span> Built fast. Chosen carefully.</div>
-  <header><button class="brand" data-view="home"><i>V</i>VibeGuys</button><nav><button data-view="explore">Explore</button><button data-view="trending">Trending</button><button data-view="staff">Staff Picks</button></nav><div class="actions"><button data-action="search" aria-label="Search">⌕</button><button data-action="sign">Sign in</button><button id="language-toggle" data-action="language" aria-label="Change language">KO</button><button class="submit-link" data-view="submit">Submit a vibe ↗</button></div></header>
+  <header><button class="brand" data-view="home"><span>VIBE<br>GUYS</span><small>GOOD VIBES. REAL PRODUCTS.</small></button><nav><button data-view="explore">Explore</button><button data-view="trending">Popular</button><button data-view="staff">Staff Picks</button><button data-view="web">Web</button><button data-view="app">App</button></nav><div class="actions"><button data-action="search" aria-label="Search">⌕</button><button data-action="sign">Sign in</button><button id="language-toggle" data-action="language" aria-label="Change language">KO</button><button class="submit-link" data-view="submit">Submit your product</button></div></header>
   <main id="app" tabindex="-1"></main>
-  <footer><button class="brand" data-view="home"><i>V</i>VibeGuys</button><p>Fast-made, thoughtfully picked.</p><button data-view="admin">Admin demo</button><a href="mailto:hello@vibeguys.example">hello@vibeguys.example ↗</a></footer>
+  <footer><button class="brand" data-view="home"><span>VIBE<br>GUYS</span><small>GOOD VIBES. REAL PRODUCTS.</small></button><p>Fast-made, thoughtfully picked.</p><button data-view="admin">Admin demo</button><a href="mailto:hello@vibeguys.example">hello@vibeguys.example ↗</a></footer>
   <dialog id="modal"></dialog><div id="toast" role="status" aria-live="polite"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0/dist/umd/supabase.js"></script><script src="config.js"></script><script src="app.js"></script><script src="supabase-client.js"></script>
 </body>
