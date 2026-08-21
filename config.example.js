@@ -5,4 +5,5 @@ window.VIBEGUYS_CONFIG = {
   supabaseUrl: "https://YOUR_PROJECT_REF.supabase.co",
   supabasePublishableKey: "sb_publishable_YOUR_KEY",
   authRedirectUrl: "https://YOUR_DEPLOYMENT.vercel.app/",
+  mcpUrl: "https://YOUR_PROJECT_REF.supabase.co/functions/v1/vibeguys-mcp",
 };
